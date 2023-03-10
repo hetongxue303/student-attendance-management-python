@@ -1,13 +1,15 @@
 from fastapi import FastAPI
 
-app = FastAPI()
+from core.config import settings
+from core.event import app_init
+from core.middleware import middleware_init
 
-
-@app.get("/")
-async def root():
-    return {"message": "Hello World"}
-
-
-@app.get("/hello/{name}")
-async def say_hello(name: str):
-    return {"message": f"Hello {name}"}
+app = FastAPI(
+    title=settings.APP_TITLE,
+    description=settings.APP_DESC,
+    version=settings.APP_VERSION,
+    debug=settings.APP_DEBUG,
+    openapi_url=f'{settings.APP_API_PREFIX}/openapi.json'
+)
+middleware_init(app)
+app_init(app)
