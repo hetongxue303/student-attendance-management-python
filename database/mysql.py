@@ -9,7 +9,9 @@ engine = create_engine(
     url=settings.MYSQL_URI,
     echo=settings.MYSQL_ECHO,
     pool_pre_ping=True,
+    pool_size=5,  # 连接池的大小默认为 5 个，设置为 0 时表示连接无限制
     pool_recycle=3600,
+    future=True,  # 使用 SQLAlchemy 2.0 API，向后兼容
     # 设置隔离级别：READ COMMITTED | READ UNCOMMITTED | REPEATABLE READ | SERIALIZABLE | AUTOCOMMIT
     isolation_level='READ UNCOMMITTED'
 )

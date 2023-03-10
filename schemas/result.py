@@ -6,6 +6,12 @@ from starlette import status
 from starlette.responses import JSONResponse
 
 T = typing.TypeVar("T")
+ModelType = typing.TypeVar("ModelType")
+
+
+class Page(GenericModel, typing.Generic[ModelType]):
+    total: int = None
+    record: typing.Optional[ModelType] | None = None
 
 
 class Result(GenericModel, typing.Generic[T]):

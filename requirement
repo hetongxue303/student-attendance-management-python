@@ -1,6 +1,6 @@
 fastapi[all]==0.93.0
 loguru==0.6.0
-SQLAlchemy==2.0.5.post1
+SQLAlchemy==1.4.44
 aioredis==4.0.2
 captcha==0.4
 bcrypt==4.0.1
