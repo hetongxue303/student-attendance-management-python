@@ -21,7 +21,9 @@ class Settings(BaseSettings):
     APP_IS_RELOAD: bool = True  # 是否热部署
 
     # 数据源配置
-    REDIS_URI: str = 'redis://:123456@127.0.0.1:6379/1'  # redis
+    REDIS_URL: str = 'redis://127.0.0.1'  # redis url
+    REDIS_PORT: int = 6379  # redis端口
+    REDIS_DB: int = 1  # redis 数据库
     REDIS_DEFAULT_EXPIRE: int = 30 * 60 * 1000  # redis默认过期时间
     MYSQL_URI: str = 'mysql+pymysql://root:123456@127.0.0.1:3306/student_attendance_management?charset=utf8'  # mysql
     MYSQL_ECHO: bool = False  # 是否打印数据库日志 (可看到创建表、表数据增删改查的信息)

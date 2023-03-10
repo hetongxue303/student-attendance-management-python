@@ -1,14 +1,15 @@
 import aioredis
-
 from aioredis import Redis
 from fastapi import FastAPI
+
+from core.config import settings
 
 
 async def get_async_redis_pool() -> Redis:
     return Redis(connection_pool=aioredis.ConnectionPool.from_url(
-        url='redis://127.0.0.1',
-        port=6379,
-        db=1,
+        url=settings.REDIS_URL,
+        port=settings.REDIS_PORT,
+        db=settings.REDIS_DB,
         encoding="utf-8",
         decode_responses=True
     ))
