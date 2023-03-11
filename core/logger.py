@@ -10,7 +10,7 @@ LOGGER_LEVEL: str = 'DEBUG'  # 日志等级: ['DEBUG' | 'INFO']
 LOGGER_ROTATION: str = '12:00'  # 日志分片: 按 时间段/文件大小 切分日志. 例如 ["500 MB" | "12:00" | "1 week"]
 LOGGER_RETENTION: str = '1 days'  # 日志保留的时间: 超出将删除最早的日志. 例如 ["1 days"]
 LOGGER_ENCODING: str = 'utf-8'  # 全局编码
-LOGGER_MAX: int = 3  # 最大文件数
+LOGGER_MAX: int = 20  # 最大文件数
 
 
 def logger_file() -> str:

@@ -29,7 +29,7 @@ async def get_page(page: int, size: int):
         raise QueryException()
 
 
-@router.put('/add', response_model=Result, summary='添加学院')
+@router.post('/add', response_model=Result, summary='添加学院')
 async def add(data: VOCollege):
     try:
         db.add(College(college_name=data.college_name,

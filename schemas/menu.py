@@ -1,5 +1,7 @@
 from datetime import datetime
 
+from pydantic import BaseModel
+
 
 class VOMenu(BaseModel):
     menu_id: int = None

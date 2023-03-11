@@ -8,3 +8,4 @@ passlib==1.7.4
 cryptography==39.0.2
 python-jose==3.3.0
 PyMySQL==1.0.2
+jsonpickle==3.0.1

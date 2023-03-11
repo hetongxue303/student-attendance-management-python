@@ -1,9 +1,3 @@
-"""
-自定义异常
-@Author:何同学
-"""
-
-
 class UserNotFoundException(Exception):
     def __init__(self, message: str = '用户名或密码错误'):
         self.message = message
