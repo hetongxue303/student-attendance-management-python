@@ -40,9 +40,9 @@ def get_db():
 def create_db():
     try:
         Base.metadata.create_all(engine)
-        logger.success('表结构配置成功')
+        logger.success('表结构加载完成')
     except Exception as e:
-        logger.error(f'表结构创建失败 -- 错误信息如下:\n{e}')
+        logger.error(f'表结构加载失败 -- 错误信息如下:\n{e}')
     finally:
         engine.dispose()
 
@@ -50,7 +50,7 @@ def create_db():
 def drop_db():
     try:
         Base.metadata.drop_all(engine)
-        logger.success('表结构删除成功')
+        logger.success('表结构删除完成')
     except Exception as e:
         logger.error(f'表结构删除失败 -- 错误信息如下:\n{e}')
     finally:
@@ -69,17 +69,15 @@ def init_data():
         engine.execute(Classes.__table__.insert(), [classes for classes in classes_data])
         engine.execute(College_Major_Classes.__table__.insert(), [cmc for cmc in college_major_classes_data])
         engine.execute(Student_Classes.__table__.insert(), [sc for sc in student_classes_data])
-        logger.success('初始化表数据成功')
+        logger.success('表数据初始化完成')
     except Exception as e:
-        logger.error(f'初始化表数据失败 -- 错误信息如下:\n{e}')
+        logger.error(f'表数据初始化失败 -- 错误信息如下:\n{e}')
     finally:
         engine.dispose()
 
 
 def init_db():
-    # 删除表和数据
-    drop_db()
-    # 创建表结构
-    create_db()
-    # 初始化表数据
-    init_data()
+    if settings.IS_INIT_MYSQL_DATA:
+        drop_db()
+        create_db()
+        init_data()

@@ -13,5 +13,5 @@ router.include_router(classes.router, tags=['班级模块'], prefix='/classes')
 
 
 def init_router(app: FastAPI):
-    logger.success('路由配置完毕')
+    logger.success('路由加载完成')
     app.include_router(router, prefix='')

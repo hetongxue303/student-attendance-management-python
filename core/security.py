@@ -15,7 +15,9 @@ from database.mysql import get_db
 from database.redis import get_redis
 from exception.custom import *
 from models import User, User_Role, Role, Role_Menu, Menu
+from schemas.menu import VOMenu
 from schemas.token import TokenData
+from schemas.user import BOUser
 
 pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
 
@@ -56,15 +58,19 @@ async def set_current_user_info(user_id: int, db: Session = next(get_db())):
     await redis.set(name='current-menu-data', value=jsonpickle.encode(menus))
 
 
-async def generate_scopes():
-    redis: Redis = await get_redis()
-    menu_data: List[Menu] = jsonpickle.decode(await redis.get('current-menu-data'))
+async def get_current_user_menu(user_id: int, db: Session = next(get_db())) -> list[Menu | VOMenu]:
+    role_id: int = db.query(User_Role).filter(User_Role.user_id == user_id).first().role_id
+    menu_ids: list[int] = [item.menu_id for item in db.query(Role_Menu).filter(Role_Menu.role_id == role_id).all()]
+    return db.query(Menu).filter(Menu.menu_id.in_(menu_ids)).all()
+
+
+async def generate_scopes(user_id: int) -> list[str]:
+    menus: list[Menu] = await get_current_user_menu(user_id=user_id)
     scopes: List[str] = []
-    for v in menu_data:
-        # TODO 这里要修改
-        if v.per_key:
-            scopes.append(v.per_key)
-    await redis.set(name='current-scopes', value=jsonpickle.encode(scopes))
+    for menu in menus:
+        if menu.permission:
+            scopes.append(menu.permission)
+    return scopes
 
 
 async def authenticate(username: str, password: str) -> User:
@@ -117,24 +123,24 @@ async def check_token(token: str = Depends(oAuth2)) -> dict:
         raise JwtVerifyException('凭证解析失败')
 
 
-async def check_permissions(security_scopes: SecurityScopes, token: str = Depends(oAuth2)):
-    redis: Redis = await get_redis()
-    authorization: str = await redis.get('authorization')
-    if authorization != token:
-        raise SecurityScopeException(code=401, message='凭证异常', headers={"WWW-Authenticate": 'Bearer '})
+async def get_user_by_token(token: str = Depends(oAuth2), db: Session = next(get_db())) -> User | BOUser:
     payload = await check_token(token)
     if not payload:
         raise JwtVerifyException(message='无效凭证')
-    token_data = TokenData(username=payload.get('sub', None),
-                           scopes=jsonpickle.decode(await redis.get('current-scopes')))
+    user_id: int = payload.get('id', None)
+    return db.query(User).filter(User.user_id == user_id).first()
+
+
+async def check_permissions(security_scopes: SecurityScopes, token: str = Depends(oAuth2)):
+    payload = await check_token(token)
+    if not payload:
+        raise JwtVerifyException(message='无效凭证')
+    token_data = TokenData(username=payload.get('sub', None), scopes=payload.get('scopes', None))
     user = get_user(token_data.username)
     if security_scopes.scopes:
         for scope in security_scopes.scopes:
             if scope not in token_data.scopes:
-                raise SecurityScopeException(
-                    code=403,
-                    message='权限不足，联系管理员！',
-                    headers={"WWW-Authenticate": 'Bearer '}
-                )
+                raise SecurityScopeException(code=403, message='权限不足，联系管理员！',
+                                             headers={"WWW-Authenticate": 'Bearer '})
     elif user is None:
         raise SecurityScopeException(code=401, message='凭证异常', headers={"WWW-Authenticate": 'Bearer '})

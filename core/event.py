@@ -14,8 +14,8 @@ def app_init(app: FastAPI):
         init_db()  # 初始化数据库
         init_router(app)  # 注册路由
         await init_redis_pool(app)  # 初始化redis
-        logger.success('启动成功')
-        logger.success('访问文档: http://127.0.0.1:8000/docs')
+        logger.success('项目启动成功')
+        logger.success('API文档: http://127.0.0.1:8000/docs')
 
     @app.on_event('shutdown')
     async def shutdown():

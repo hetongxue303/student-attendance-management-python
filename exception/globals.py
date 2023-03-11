@@ -8,12 +8,12 @@ from schemas.result import JSONResult
 
 
 def init_exception(app: FastAPI):
-    logger.success('开启全局异常捕获')
+    logger.success('全局异常捕获加载完成')
 
     @app.exception_handler(Exception)
     async def http_exception(request: Request, e: Exception):
         logger.error(e)
-        return JSONResult(code=status.HTTP_500_INTERNAL_SERVER_ERROR, message="服务器错误")
+        return JSONResult(code=status.HTTP_500_INTERNAL_SERVER_ERROR, message="服务器异常")
 
     @app.exception_handler(UnauthorizedException)
     async def http_exception(request: Request, e: UnauthorizedException):

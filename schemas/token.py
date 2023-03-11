@@ -33,6 +33,7 @@ class VOLogin(BaseModel):
     is_admin: bool = None
     gender: str = None
     is_status: bool = None
+    permission: list[str] = None
     menus: list[VOMenu] = None
 
     class Config:

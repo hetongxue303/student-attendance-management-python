@@ -11,7 +11,7 @@ from core.config import settings
 def middleware_init(app: FastAPI):
     cors_middleware(app)  # 配置跨域中间件
     http_middleware(app)  # 配置http中间件
-    logger.success('中间件配置完毕')
+    logger.success('中间件加载完成')
 
 
 def cors_middleware(app: FastAPI):
