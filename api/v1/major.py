@@ -44,7 +44,7 @@ async def get_page(college_id: int):
 
 
 @router.post('/add', response_model=Result, summary='新增专业')
-async def add(data: VOMajor):
+async def insert(data: VOMajor):
     try:
         db.add(Major(major_name=data.major_name, college_id=data.college_id,
                      description=None if data.description == '' or data.description is None else data.description))
@@ -56,7 +56,7 @@ async def add(data: VOMajor):
 
 
 @router.delete('/delete/{id}', response_model=Result, summary='删除专业')
-async def add(id: int):
+async def delete(id: int):
     try:
         db.query(Major).filter(Major.major_id == id).delete()
         db.commit()
@@ -67,7 +67,7 @@ async def add(id: int):
 
 
 @router.put('/delete/batch', response_model=Result, summary='删除专业(批量)')
-async def add(data: list[int]):
+async def batch_delete(data: list[int]):
     try:
         db.query(Major).filter(Major.major_id.in_(data)).delete()
         db.commit()
@@ -78,7 +78,7 @@ async def add(data: list[int]):
 
 
 @router.put('/update', response_model=Result, summary='修改专业')
-async def add(data: VOMajor):
+async def update(data: VOMajor):
     try:
         raw = db.query(Major).filter(Major.major_id == data.major_id).first()
         raw.major_name = data.major_name

@@ -36,7 +36,7 @@ async def get_page(page: int, size: int, classes_name: str = None):
 
 
 @router.post('/add', response_model=Result, summary='新增班级')
-async def add(data: VOClasses):
+async def insert(data: VOClasses):
     try:
         db.add(Classes(classes_name=data.classes_name, major_id=data.major_id,
                        description=None if data.description == '' or data.description is None else data.description))
@@ -48,7 +48,7 @@ async def add(data: VOClasses):
 
 
 @router.delete('/delete/{id}', response_model=Result, summary='删除班级')
-async def add(id: int):
+async def delete(id: int):
     try:
         db.query(Classes).filter(Classes.classes_id == id).delete()
         db.commit()
@@ -59,7 +59,7 @@ async def add(id: int):
 
 
 @router.put('/delete/batch', response_model=Result, summary='删除班级(批量)')
-async def add(data: list[int]):
+async def batch_delete(data: list[int]):
     try:
         db.query(Classes).filter(Classes.classes_id.in_(data)).delete()
         db.commit()
@@ -70,7 +70,7 @@ async def add(data: list[int]):
 
 
 @router.put('/update', response_model=Result, summary='修改班级')
-async def add(data: VOClasses):
+async def update(data: VOClasses):
     try:
         raw = db.query(Classes).filter(Classes.classes_id == data.classes_id).first()
         raw.classes_name = data.classes_name

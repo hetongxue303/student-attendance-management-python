@@ -1,7 +1,6 @@
-from fastapi import APIRouter, Security
+from fastapi import APIRouter
 from sqlalchemy.orm import Session
 
-from core.security import check_permissions
 from database.mysql import get_db
 from exception.custom import UpdateException, DeleteException, InsertException, QueryException
 from models import College
@@ -12,8 +11,7 @@ router = APIRouter()
 db: Session = next(get_db())
 
 
-@router.get('/list/all', response_model=Result[list[VOCollege]], summary='获取所有学院',
-            dependencies=[Security(check_permissions)])
+@router.get('/list/all', response_model=Result[list[VOCollege]], summary='获取所有学院')
 async def get_all():
     try:
         return Result(content=db.query(College).all(), message='查询成功')
@@ -38,7 +36,7 @@ async def get_page(page: int, size: int, college_name: str = None):
 
 
 @router.post('/add', response_model=Result, summary='添加学院')
-async def add(data: VOCollege):
+async def insert(data: VOCollege):
     try:
         db.add(College(college_name=data.college_name,
                        description=None if data.description == '' or data.description is None else data.description))
@@ -50,7 +48,7 @@ async def add(data: VOCollege):
 
 
 @router.delete('/delete/{id}', response_model=Result, summary='删除学院')
-async def add(id: int):
+async def delete(id: int):
     try:
         db.query(College).filter(College.college_id == id).delete()
         db.commit()
@@ -61,7 +59,7 @@ async def add(id: int):
 
 
 @router.put('/delete/batch', response_model=Result, summary='删除学院(批量)')
-async def add(data: list[int]):
+async def batch_delete(data: list[int]):
     try:
         db.query(College).filter(College.college_id.in_(data)).delete()
         db.commit()
@@ -72,7 +70,7 @@ async def add(data: list[int]):
 
 
 @router.put('/update', response_model=Result, summary='修改学院')
-async def add(data: VOCollege):
+async def update(data: VOCollege):
     try:
         raw = db.query(College).filter(College.college_id == data.college_id).first()
         raw.college_name = data.college_name
