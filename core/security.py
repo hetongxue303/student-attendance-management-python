@@ -73,6 +73,11 @@ async def generate_scopes(user_id: int) -> list[str]:
     return scopes
 
 
+async def get_user_role(user_id: int, db: Session = next(get_db())) -> list[str]:
+    role_ids: list[int] = [item.role_id for item in db.query(User_Role).filter(User_Role.user_id == user_id).all()]
+    return [item.role_code for item in db.query(Role).filter(Role.role_id.in_(role_ids)).all()]
+
+
 async def authenticate(username: str, password: str) -> User:
     user = await get_user(username)
     if not user:

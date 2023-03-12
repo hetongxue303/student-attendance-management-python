@@ -18,7 +18,7 @@ user_data = [
     {
         'username': '2021230522',
         'password': '$2b$12$q0OSa5wwpo1xkUfRCx2DZuPqWt04CQ.CNR.lV6oGqnpVmww2055Py',
-        'real_name': '管理员',
+        'real_name': '王橓西',
         'gender': '1',
         'is_status': '1',
         'is_admin': '0'
@@ -162,60 +162,38 @@ college_data = [
 ]
 
 major_data = [
-    {'major_name': '通信与信息系统'},
-    {'major_name': '信号与信息处理'},
-    {'major_name': '控制理论与控制工程'},
-    {'major_name': '系统工程'},
-    {'major_name': '检测技术与自动化装置'},
-    {'major_name': '计算机系统结构'},
-    {'major_name': '计算机应用技术'},
-    {'major_name': '物联网工程'},
+    {'major_name': '通信与信息系统', 'college_id': 1},
+    {'major_name': '信号与信息处理', 'college_id': 1},
+    {'major_name': '控制理论与控制工程', 'college_id': 2},
+    {'major_name': '系统工程', 'college_id': 2},
+    {'major_name': '检测技术与自动化装置', 'college_id': 2},
+    {'major_name': '计算机系统结构', 'college_id': 3},
+    {'major_name': '计算机应用技术', 'college_id': 3},
+    {'major_name': '物联网工程', 'college_id': 1}
 ]
 
 classes_data = [
-    {'classes_name': '通信与信息系统-1班'},
-    {'classes_name': '通信与信息系统-2班'},
-    {'classes_name': '信号与信息处理-1班'},
-    {'classes_name': '信号与信息处理-2班'},
-    {'classes_name': '控制理论与控制工程-1班'},
-    {'classes_name': '控制理论与控制工程-2班'},
-    {'classes_name': '控制理论与控制工程-3班'},
-    {'classes_name': '系统工程-高级班'},
-    {'classes_name': '检测技术与自动化装置-初级班'},
-    {'classes_name': '检测技术与自动化装置-进阶班'},
-    {'classes_name': '计算机系统结构-初级班'},
-    {'classes_name': '计算机系统结构-进阶班'},
-    {'classes_name': '计算机应用技术-1班'},
-    {'classes_name': '计算机应用技术-2班'},
-    {'classes_name': '物联网工程-1班'},
-    {'classes_name': '物联网工程-2班'},
-    {'classes_name': '物联网工程-3班'},
-    {'classes_name': '物联网工程-1班(专升本)'},
-    {'classes_name': '物联网工程-2班(专升本)'},
-]
-
-college_major_classes_data = [
-    {'college_id': 1, 'major_id': 1, 'classes_id': 1},
-    {'college_id': 1, 'major_id': 1, 'classes_id': 2},
-    {'college_id': 1, 'major_id': 2, 'classes_id': 3},
-    {'college_id': 1, 'major_id': 2, 'classes_id': 4},
-    {'college_id': 2, 'major_id': 3, 'classes_id': 5},
-    {'college_id': 2, 'major_id': 3, 'classes_id': 6},
-    {'college_id': 2, 'major_id': 3, 'classes_id': 7},
-    {'college_id': 2, 'major_id': 4, 'classes_id': 8},
-    {'college_id': 2, 'major_id': 5, 'classes_id': 9},
-    {'college_id': 2, 'major_id': 5, 'classes_id': 10},
-    {'college_id': 3, 'major_id': 6, 'classes_id': 11},
-    {'college_id': 3, 'major_id': 6, 'classes_id': 12},
-    {'college_id': 3, 'major_id': 7, 'classes_id': 13},
-    {'college_id': 3, 'major_id': 7, 'classes_id': 14},
-    {'college_id': 1, 'major_id': 8, 'classes_id': 15},
-    {'college_id': 1, 'major_id': 8, 'classes_id': 16},
-    {'college_id': 1, 'major_id': 8, 'classes_id': 17},
-    {'college_id': 1, 'major_id': 8, 'classes_id': 18},
-    {'college_id': 1, 'major_id': 8, 'classes_id': 19},
+    {'classes_name': '通信与信息系统-1班', 'major_id': 1},
+    {'classes_name': '通信与信息系统-2班', 'major_id': 1},
+    {'classes_name': '信号与信息处理-1班', 'major_id': 2},
+    {'classes_name': '信号与信息处理-2班', 'major_id': 2},
+    {'classes_name': '控制理论与控制工程-1班', 'major_id': 3},
+    {'classes_name': '控制理论与控制工程-2班', 'major_id': 3},
+    {'classes_name': '控制理论与控制工程-3班', 'major_id': 3},
+    {'classes_name': '系统工程-高级班', 'major_id': 4},
+    {'classes_name': '检测技术与自动化装置-初级班', 'major_id': 5},
+    {'classes_name': '检测技术与自动化装置-进阶班', 'major_id': 5},
+    {'classes_name': '计算机系统结构-初级班', 'major_id': 6},
+    {'classes_name': '计算机系统结构-进阶班', 'major_id': 6},
+    {'classes_name': '计算机应用技术-1班', 'major_id': 7},
+    {'classes_name': '计算机应用技术-2班', 'major_id': 7},
+    {'classes_name': '物联网工程-1班', 'major_id': 8},
+    {'classes_name': '物联网工程-2班', 'major_id': 8},
+    {'classes_name': '物联网工程-3班', 'major_id': 8},
+    {'classes_name': '物联网工程-1班(专升本)', 'major_id': 8},
+    {'classes_name': '物联网工程-2班(专升本)', 'major_id': 8}
 ]
 
 student_classes_data = [
-    {'user_id': 3, 'cmc_id': 11}
+    {'user_id': 3, 'classes_id': 11}
 ]

@@ -10,5 +10,4 @@ from models.role import *
 from models.menu import *
 from models.user_role import *
 from models.role_menu import *
-from models.college_major_classes import *
 from models.student_classes import *

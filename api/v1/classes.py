@@ -19,9 +19,15 @@ async def get_all():
         raise QueryException()
 
 
-@router.get('/list', response_model=Result[list[VOClasses]], summary='获取所有班级(分页)')
-async def get_page(page: int, size: int):
+@router.get('/list', response_model=Result[Page[list[VOClasses]]], summary='获取所有班级(分页)')
+async def get_page(page: int, size: int, classes_name: str = None):
     try:
+        if classes_name:
+            total = db.query(Classes).filter(Classes.classes_name.like('%{0}%'.format(classes_name))).count()
+            record = db.query(Classes).filter(Classes.classes_name.like('%{0}%'.format(classes_name))).limit(
+                size).offset((page - 1) * size).all()
+            return Result(content=Page(total=total, record=record), message='查询成功')
+
         total = db.query(Classes).count()
         record = db.query(Classes).limit(size).offset((page - 1) * size).all()
         return Result(content=Page(total=total, record=record), message='查询成功')
@@ -32,7 +38,7 @@ async def get_page(page: int, size: int):
 @router.post('/add', response_model=Result, summary='新增班级')
 async def add(data: VOClasses):
     try:
-        db.add(Classes(classes_name=data.classes_name, college_id=data.college_id, major_id=data.major_id,
+        db.add(Classes(classes_name=data.classes_name, major_id=data.major_id,
                        description=None if data.description == '' or data.description is None else data.description))
         db.commit()
         return Result(message='添加成功')
@@ -68,7 +74,6 @@ async def add(data: VOClasses):
     try:
         raw = db.query(Classes).filter(Classes.classes_id == data.classes_id).first()
         raw.classes_name = data.classes_name
-        raw.college_id = data.college_id
         raw.major_id = data.major_id
         raw.description = data.description
         db.commit()

@@ -1,6 +1,7 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Security
 from sqlalchemy.orm import Session
 
+from core.security import check_permissions
 from database.mysql import get_db
 from exception.custom import UpdateException, DeleteException, InsertException, QueryException
 from models import College
@@ -11,7 +12,8 @@ router = APIRouter()
 db: Session = next(get_db())
 
 
-@router.get('/list/all', response_model=Result[list[VOCollege]], summary='获取所有学院')
+@router.get('/list/all', response_model=Result[list[VOCollege]], summary='获取所有学院',
+            dependencies=[Security(check_permissions)])
 async def get_all():
     try:
         return Result(content=db.query(College).all(), message='查询成功')
@@ -20,8 +22,14 @@ async def get_all():
 
 
 @router.get('/list', response_model=Result[Page[list[VOCollege]]], summary='获取所有学院(分页)')
-async def get_page(page: int, size: int):
+async def get_page(page: int, size: int, college_name: str = None):
     try:
+        if college_name:
+            total = db.query(College).filter(College.college_name.like('%{0}%'.format(college_name))).count()
+            record = db.query(College).filter(College.college_name.like('%{0}%'.format(college_name))).limit(
+                size).offset((page - 1) * size).all()
+            return Result(content=Page(total=total, record=record), message='查询成功')
+
         total = db.query(College).count()
         record = db.query(College).limit(size).offset((page - 1) * size).all()
         return Result(content=Page(total=total, record=record), message='查询成功')

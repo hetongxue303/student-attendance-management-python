@@ -2,7 +2,6 @@ from fastapi import FastAPI
 
 from core.config import settings
 from core.event import app_init
-from core.middleware import middleware_init
 
 app = FastAPI(
     title=settings.APP_TITLE,
@@ -11,5 +10,4 @@ app = FastAPI(
     debug=settings.APP_DEBUG,
     openapi_url=f'{settings.APP_API_PREFIX}/openapi.json'
 )
-middleware_init(app)
 app_init(app)

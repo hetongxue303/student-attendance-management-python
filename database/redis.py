@@ -2,6 +2,7 @@ import aioredis
 from aioredis import Redis
 from fastapi import FastAPI
 
+from core import logger
 from core.config import settings
 
 
@@ -16,6 +17,7 @@ async def get_async_redis_pool() -> Redis:
 
 
 async def init_redis_pool(app: FastAPI):
+    logger.success('redis加载完成')
     app.state.redis = await get_async_redis_pool()
 
 

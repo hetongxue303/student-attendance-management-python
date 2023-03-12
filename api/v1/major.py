@@ -19,9 +19,15 @@ async def get_all():
         raise QueryException()
 
 
-@router.get('/list', response_model=Result[list[VOMajor]], summary='获取所有专业(分页)')
-async def get_page(page: int, size: int):
+@router.get('/list', response_model=Result[Page[list[VOMajor]]], summary='获取所有专业(分页)')
+async def get_page(page: int, size: int, major_name: str = None):
     try:
+        if major_name:
+            total = db.query(Major).filter(Major.major_name.like('%{0}%'.format(major_name))).count()
+            record = db.query(Major).filter(Major.major_name.like('%{0}%'.format(major_name))).limit(size).offset(
+                (page - 1) * size).all()
+            return Result(content=Page(total=total, record=record), message='查询成功')
+
         total = db.query(Major).count()
         record = db.query(Major).limit(size).offset((page - 1) * size).all()
         return Result(content=Page(total=total, record=record), message='查询成功')
@@ -29,10 +35,18 @@ async def get_page(page: int, size: int):
         raise QueryException()
 
 
+@router.get('/college_id/{college_id}', response_model=Result[list[VOMajor]], summary='获取专业(学院ID)')
+async def get_page(college_id: int):
+    try:
+        return Result(content=db.query(Major).filter(Major.college_id == college_id).all(), message='查询成功')
+    except:
+        raise QueryException()
+
+
 @router.post('/add', response_model=Result, summary='新增专业')
 async def add(data: VOMajor):
     try:
-        db.add(Major(major_name=data.major_name,
+        db.add(Major(major_name=data.major_name, college_id=data.college_id,
                      description=None if data.description == '' or data.description is None else data.description))
         db.commit()
         return Result(message='添加成功')
@@ -69,6 +83,7 @@ async def add(data: VOMajor):
         raw = db.query(Major).filter(Major.major_id == data.major_id).first()
         raw.major_name = data.major_name
         raw.description = data.description
+        raw.college_id = data.college_id
         db.commit()
         return Result(message='修改成功')
     except:
