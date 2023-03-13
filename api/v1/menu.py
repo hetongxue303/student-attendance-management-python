@@ -3,8 +3,9 @@ from sqlalchemy.orm import Session
 
 from database.mysql import get_db
 from exception.custom import QueryException, UpdateException, DeleteException, InsertException
+from filter.menu import filter_menu_to_tree
 from models import Menu
-from schemas.menu import VOMenu
+from schemas.menu import VOMenu, VOMenuTree
 from schemas.result import Result, Page
 
 router = APIRouter()
@@ -15,6 +16,14 @@ db: Session = next(get_db())
 async def get_all():
     try:
         return Result(content=db.query(Menu).all(), message='查询成功')
+    except:
+        raise QueryException()
+
+
+@router.get('/list/tree', response_model=Result[list[VOMenuTree]], summary='获取所有菜单(树)')
+async def get_tree():
+    try:
+        return Result(content=filter_menu_to_tree(db.query(Menu).all()), message='查询成功')
     except:
         raise QueryException()
 

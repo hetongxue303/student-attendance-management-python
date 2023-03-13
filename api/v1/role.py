@@ -72,8 +72,7 @@ async def batch_delete(data: list[int]):
 @router.put('/update', response_model=Result, summary='修改角色')
 async def update(data: VORole):
     try:
-        print(data)
-        raw = db.query(Role).filter(Role.user_id == data.role_id).first()
+        raw = db.query(Role).filter(Role.role_id == data.role_id).first()
         raw.role_name = data.role_name
         raw.role_code = data.role_code
         raw.is_status = '1' if data.is_status else '0'

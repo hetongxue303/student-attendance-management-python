@@ -25,3 +25,7 @@ class VOMenu(BaseModel):
     class Config:
         orm_mode = True
         arbitrary_types_allowed = True
+
+
+class VOMenuTree(VOMenu):
+    children: list[VOMenu] = []

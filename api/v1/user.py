@@ -72,7 +72,6 @@ async def batch_delete(data: list[int]):
 @router.put('/update', response_model=Result, summary='修改用户')
 async def update(data: BOUser):
     try:
-        print(data)
         raw = db.query(User).filter(User.user_id == data.user_id).first()
         raw.real_name = data.real_name
         raw.gender = data.gender.__str__()
