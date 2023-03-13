@@ -41,7 +41,7 @@ async def login(data: OAuth2PasswordRequestForm = Depends(), code: str = Form())
 @router.get('/logout', response_model=Result, summary='用户注销')
 async def logout():
     redis: Redis = await get_redis()
-    redis_key: list[str] = ['userinfo']
+    redis_key: list[str] = ['userinfo', Security.TOKEN]
     for key in redis_key:
         await redis.delete(key)
     return Result(message='注销成功')

@@ -25,3 +25,9 @@ class VOCourse(BaseModel):
     class Config:
         orm_mode = True
         arbitrary_types_allowed = True
+
+
+class VOMyCourse(VOCourse):
+    checked_in: int = None  # 已签到次数
+    not_checked_in: int = None  # 已签到次数
+    remainder: int = None  # 剩余次数

@@ -68,22 +68,22 @@ menu_data = [
         'permission': 'attendance:record:list', 'is_show': '1', 'is_sub': '0'
     },
     {
-        'parent_id': 0, 'menu_title': '校园管理', 'menu_type': '1', 'router_name': 'attendance', 'sub_count': 3,
-        'router_path': '/attendance', 'component': '', 'sort': 8, 'icon': 'index',
+        'parent_id': 0, 'menu_title': '校园管理', 'menu_type': '1', 'router_name': 'school', 'sub_count': 3,
+        'router_path': '/school', 'component': '', 'sort': 8, 'icon': 'index',
         'permission': '', 'is_show': '1', 'is_sub': '1'
     },
     {
-        'parent_id': 5, 'menu_title': '班级管理', 'menu_type': '2', 'router_name': 'publish', 'sub_count': 0,
+        'parent_id': 8, 'menu_title': '班级管理', 'menu_type': '2', 'router_name': 'publish', 'sub_count': 0,
         'router_path': '/school/classes', 'component': 'school/classes/index.vue', 'sort': 9, 'icon': 'index',
         'permission': 'school:classes:list', 'is_show': '1', 'is_sub': '0'
     },
     {
-        'parent_id': 5, 'menu_title': '专业管理', 'menu_type': '2', 'router_name': 'major', 'sub_count': 0,
+        'parent_id': 8, 'menu_title': '专业管理', 'menu_type': '2', 'router_name': 'major', 'sub_count': 0,
         'router_path': '/school/major', 'component': 'school/major/index.vue', 'sort': 10, 'icon': 'index',
         'permission': 'school:major:list', 'is_show': '1', 'is_sub': '0'
     },
     {
-        'parent_id': 5, 'menu_title': '学院管理', 'menu_type': '2', 'router_name': 'college', 'sub_count': 0,
+        'parent_id': 8, 'menu_title': '学院管理', 'menu_type': '2', 'router_name': 'college', 'sub_count': 0,
         'router_path': '/school/college', 'component': 'school/college/index.vue', 'sort': 11, 'icon': 'index',
         'permission': 'school:college:list', 'is_show': '1', 'is_sub': '0'
     },
@@ -199,6 +199,9 @@ student_classes_data = [
 ]
 
 course_data = [
-    {'course_name': '物联网工程', 'college_id': 1, 'major_id': 8, 'classes_id': 16, 'count': 40, 'time': 4},
-    {'course_name': '控制理论', 'college_id': 2, 'major_id': 3, 'classes_id': 7, 'count': 40, 'time': 4}
+    {'course_name': '物联网工程', 'college_id': 1, 'major_id': 8, 'classes_id': 16, 'count': 40, 'time': 12},
+    {'course_name': '控制理论', 'college_id': 2, 'major_id': 3, 'classes_id': 7, 'count': 42, 'time': 16},
+    {'course_name': '计算机系统', 'college_id': 3, 'major_id': 7, 'classes_id': 12, 'count': 25, 'time': 20}
 ]
+
+user_course_data = [{'user_id': 3, 'course_id': 1}, {'user_id': 2, 'course_id': 1}, {'user_id': 2, 'course_id': 3}]
