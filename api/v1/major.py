@@ -36,7 +36,7 @@ async def get_page(page: int, size: int, major_name: str = None):
 
 
 @router.get('/college_id/{college_id}', response_model=Result[list[VOMajor]], summary='获取专业(学院ID)')
-async def get_page(college_id: int):
+async def get_major_by_college_id(college_id: int):
     try:
         return Result(content=db.query(Major).filter(Major.college_id == college_id).all(), message='查询成功')
     except:

@@ -97,7 +97,7 @@ async def update(data: VOMenu):
         raw.permission = data.permission
         raw.sub_count = data.sub_count
         raw.is_show = '1' if data.is_show else '0'
-        raw.is_sub = '1' if data.is_sub else '0',
+        raw.is_sub = '1' if data.is_sub else '0'
         raw.is_status = '1' if data.is_status else '0'
         raw.description = data.description
         db.commit()

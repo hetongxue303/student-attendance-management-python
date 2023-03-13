@@ -35,6 +35,14 @@ async def get_page(page: int, size: int, classes_name: str = None):
         raise QueryException()
 
 
+@router.get('/major_id/{major_id}', response_model=Result[list[VOClasses]], summary='获取班级(专业ID)')
+async def get_classes_by_major_id(major_id: int):
+    try:
+        return Result(content=db.query(Classes).filter(Classes.major_id == major_id).all(), message='查询成功')
+    except:
+        raise QueryException()
+
+
 @router.post('/add', response_model=Result, summary='新增班级')
 async def insert(data: VOClasses):
     try:

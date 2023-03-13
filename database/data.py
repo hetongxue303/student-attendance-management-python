@@ -197,3 +197,8 @@ classes_data = [
 student_classes_data = [
     {'user_id': 3, 'classes_id': 11}
 ]
+
+course_data = [
+    {'course_name': '物联网工程', 'college_id': 1, 'major_id': 8, 'classes_id': 16, 'count': 40, 'time': 4},
+    {'course_name': '控制理论', 'college_id': 2, 'major_id': 3, 'classes_id': 7, 'count': 40, 'time': 4}
+]
