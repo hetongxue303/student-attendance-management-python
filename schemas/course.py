@@ -5,6 +5,7 @@ from pydantic import BaseModel
 from schemas.classes import VOClasses
 from schemas.college import VOCollege
 from schemas.major import VOMajor
+from schemas.user import VOUser
 
 
 class VOCourse(BaseModel):
@@ -25,6 +26,11 @@ class VOCourse(BaseModel):
     class Config:
         orm_mode = True
         arbitrary_types_allowed = True
+
+
+class BOCourse(VOCourse):
+    user_id: int = None
+    user: VOUser = None
 
 
 class VOMyCourse(VOCourse):

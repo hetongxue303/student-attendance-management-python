@@ -31,7 +31,7 @@ async def login(data: OAuth2PasswordRequestForm = Depends(), code: str = Form())
         token: str = await generate_token({'id': user.user_id, 'sub': user.username, 'scopes': permission})
         userinfo: VOLogin = VOLogin(username=user.username, real_name=user.real_name, permission=permission,
                                     gender=user.gender, is_status=user.is_status, is_admin=user.is_admin,
-                                    roles=await get_user_role(user_id=user.user_id),
+                                    roles=await get_user_role(user_id=user.user_id), user_id=user.user_id,
                                     menus=await get_current_user_menu(user_id=user.user_id))
         await redis.setex(name=Security.TOKEN, value=token, time=timedelta(milliseconds=settings.JWT_EXPIRE))
         await redis.set(name='userinfo', value=jsonpickle.encode(userinfo))

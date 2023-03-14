@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from database.mysql import get_db
 from exception.custom import QueryException, UpdateException, DeleteException, InsertException
-from models import User
+from models import User, User_Role
 from schemas.result import Result, Page
 from schemas.user import BOUser, VOUser
 
@@ -15,6 +15,18 @@ db: Session = next(get_db())
 async def get_all():
     try:
         return Result(content=db.query(User).all(), message='查询成功')
+    except:
+        raise QueryException()
+
+
+@router.get('/list/teacher', response_model=Result[list[BOUser]], summary='获取所有用户')
+async def get_by_username(username: str):
+    try:
+        user = db.query(User).filter(User.username == username).first()
+        temp = db.query(User_Role).filter(User_Role.role_id == 2).all()
+        ids = [item.user_id for item in temp]
+        if bool(int(user.is_admin)):
+            return Result(content=db.query(User).filter(User.user_id.in_(ids)).all(), message='查询成功')
     except:
         raise QueryException()
 
@@ -37,6 +49,8 @@ async def get_page(page: int, size: int, real_name: str = None):
 
 @router.post('/add', response_model=Result, summary='添加用户')
 async def insert(data: VOUser):
+    if db.query(User).filter(User.username == data.username).first():
+        raise InsertException(message='用户名已存在')
     try:
         db.add(User(username=data.username, real_name=data.real_name, gender=data.gender,
                     description=None if data.description == '' or data.description is None else data.description))

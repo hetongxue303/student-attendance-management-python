@@ -204,4 +204,6 @@ course_data = [
     {'course_name': '计算机系统', 'college_id': 3, 'major_id': 7, 'classes_id': 12, 'count': 25, 'time': 20}
 ]
 
-user_course_data = [{'user_id': 3, 'course_id': 1}, {'user_id': 2, 'course_id': 1}, {'user_id': 2, 'course_id': 3}]
+user_course_data = [
+    {'user_id': 2, 'course_id': 1}, {'user_id': 2, 'course_id': 3}
+]
