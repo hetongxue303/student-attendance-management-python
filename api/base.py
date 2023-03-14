@@ -1,6 +1,6 @@
 from fastapi import APIRouter, FastAPI
 
-from api.v1 import test, college, major, classes, security, user, role, menu, course, check
+from api.v1 import test, college, major, classes, security, user, role, menu, course, check, attendance
 from core import logger
 
 router = APIRouter(prefix='/v1')
@@ -14,6 +14,7 @@ router.include_router(college.router, tags=['学院模块'], prefix='/college')
 router.include_router(major.router, tags=['专业模块'], prefix='/major')
 router.include_router(classes.router, tags=['班级模块'], prefix='/classes')
 router.include_router(course.router, tags=['课程模块'], prefix='/course')
+router.include_router(attendance.router, tags=['考勤模块'], prefix='/attendance')
 router.include_router(check.router, tags=['签到模块'], prefix='/check')
 
 

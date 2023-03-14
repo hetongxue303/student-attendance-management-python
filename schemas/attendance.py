@@ -2,20 +2,18 @@ from datetime import datetime
 
 from pydantic import BaseModel
 
-from schemas.attendance import VOAttendance
 from schemas.course import VOCourse
 from schemas.user import VOUser
 
 
-class VOCheck(BaseModel):
-    check_id: int = None
+class VOAttendance(BaseModel):
+    attendance_id: int = None
     user_id: int = None
     user: VOUser = None
     course_id: int = None
     course: VOCourse = None
-    attendance_id: int = None
-    Attendance: VOAttendance = None
-    check_time: datetime = None
+    attendance_time: datetime = None
+    time: int = None
     create_time: datetime = None
     update_time: datetime = None
 

@@ -12,5 +12,6 @@ from models.user_role import *
 from models.role_menu import *
 from models.course import *
 from models.user_course import *
+from models.attendance import *
 from models.check import *
 from models.student_classes import *
