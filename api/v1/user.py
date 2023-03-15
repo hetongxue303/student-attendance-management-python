@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 from sqlalchemy.orm import Session
 
+from core.security import get_password_hash
 from database.mysql import get_db
 from exception.custom import QueryException, UpdateException, DeleteException, InsertException
 from models import User, User_Role
@@ -32,11 +33,25 @@ async def get_by_username(username: str):
 
 
 @router.get('/list', response_model=Result[Page[list[BOUser]]], summary='获取所有用户(分页)')
-async def get_page(page: int, size: int, real_name: str = None):
+async def get_page(page: int, size: int, username: str = None, real_name: str = None):
     try:
+        if real_name and username:
+            total = db.query(User).filter(User.real_name.like('%{0}%'.format(real_name)),
+                                          User.username.like('%{0}%'.format(username))).count()
+            record = db.query(User).filter(User.real_name.like('%{0}%'.format(real_name)),
+                                           User.username.like('%{0}%'.format(username))).limit(size).offset(
+                (page - 1) * size).all()
+            return Result(content=Page(total=total, record=record), message='查询成功')
+
         if real_name:
             total = db.query(User).filter(User.real_name.like('%{0}%'.format(real_name))).count()
             record = db.query(User).filter(User.real_name.like('%{0}%'.format(real_name))).limit(
+                size).offset((page - 1) * size).all()
+            return Result(content=Page(total=total, record=record), message='查询成功')
+
+        if username:
+            total = db.query(User).filter(User.username.like('%{0}%'.format(username))).count()
+            record = db.query(User).filter(User.username.like('%{0}%'.format(username))).limit(
                 size).offset((page - 1) * size).all()
             return Result(content=Page(total=total, record=record), message='查询成功')
 
@@ -49,10 +64,12 @@ async def get_page(page: int, size: int, real_name: str = None):
 
 @router.post('/add', response_model=Result, summary='添加用户')
 async def insert(data: VOUser):
+    print(data)
     if db.query(User).filter(User.username == data.username).first():
         raise InsertException(message='用户名已存在')
     try:
-        db.add(User(username=data.username, real_name=data.real_name, gender=data.gender,
+        db.add(User(username=data.username, real_name=data.real_name, gender=data.gender.__str__(),
+                    is_status='1' if data.is_status else '0', password=get_password_hash(data.password),
                     description=None if data.description == '' or data.description is None else data.description))
         db.commit()
         return Result(message='添加成功')
