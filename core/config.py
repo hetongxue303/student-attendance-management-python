@@ -26,7 +26,7 @@ class Settings(BaseSettings):
     REDIS_DB: int = 1  # redis 数据库
     REDIS_DEFAULT_EXPIRE: int = 30 * 60 * 1000  # redis默认过期时间
     MYSQL_URI: str = 'mysql+pymysql://root:123456@127.0.0.1:3306/student_attendance_management?charset=utf8'  # mysql
-    MYSQL_ECHO: bool = False  # 是否打印数据库日志 (可看到创建表、表数据增删改查的信息)
+    MYSQL_ECHO: bool = True  # 是否打印数据库日志 (可看到创建表、表数据增删改查的信息)
     IS_INIT_MYSQL_DATA: bool = True  # 是否初始化表数据及结构
 
     # jwt配置

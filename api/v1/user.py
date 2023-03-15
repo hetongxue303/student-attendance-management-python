@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from core.security import get_password_hash
 from database.mysql import get_db
 from exception.custom import QueryException, UpdateException, DeleteException, InsertException
-from models import User, User_Role
+from models import User, User_Role, Student_Classes
 from schemas.result import Result, Page
 from schemas.user import BOUser, VOUser
 
@@ -64,7 +64,6 @@ async def get_page(page: int, size: int, username: str = None, real_name: str = 
 
 @router.post('/add', response_model=Result, summary='添加用户')
 async def insert(data: VOUser):
-    print(data)
     if db.query(User).filter(User.username == data.username).first():
         raise InsertException(message='用户名已存在')
     try:
@@ -81,6 +80,11 @@ async def insert(data: VOUser):
 @router.delete('/delete/{id}', response_model=Result, summary='删除用户')
 async def delete(id: int):
     try:
+        ur = db.query(User_Role).filter(User_Role.user_id == id).all()
+        if ur:
+            db.delete(ur)
+        sc = db.query(Student_Classes).filter(Student_Classes.user_id == id).all()
+        db.delete(sc)
         db.query(User).filter(User.user_id == id).delete()
         db.commit()
         return Result(message='删除成功')
@@ -92,6 +96,12 @@ async def delete(id: int):
 @router.put('/delete/batch', response_model=Result, summary='删除用户(批量)')
 async def batch_delete(data: list[int]):
     try:
+        ur = db.query(User_Role).filter(User_Role.user_id.in_(data)).all()
+        if ur:
+            db.delete(ur)
+        sc = db.query(Student_Classes).filter(Student_Classes.user_id.in_(data)).all()
+        if sc:
+            db.delete(sc)
         db.query(User).filter(User.user_id.in_(data)).delete()
         db.commit()
         return Result(message='删除成功')
