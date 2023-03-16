@@ -1,11 +1,12 @@
 from fastapi import APIRouter
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from database.mysql import get_db
 from exception.custom import QueryException, UpdateException, DeleteException, InsertException
 from models import Role, Role_Menu, User_Role
 from schemas.result import Result, Page
-from schemas.role import VORole
+from schemas.role import VORole, BORole
 
 router = APIRouter()
 db: Session = next(get_db())
@@ -36,15 +37,21 @@ async def get_page(page: int, size: int, role_name: str = None):
 
 
 @router.post('/add', response_model=Result, summary='添加角色')
-async def insert(data: VORole):
-    if db.query(Role).filter(Role.role_name == data.role_name).first():
+async def insert(data: BORole):
+    role: VORole = data.role
+    ids: list[int] = data.menu_ids
+    if db.query(Role).filter(Role.role_name == role.role_name).first():
         raise InsertException(message='角色名称重复')
-    if db.query(Role).filter(Role.role_code == data.role_code).first():
+    if db.query(Role).filter(Role.role_code == role.role_code).first():
         raise InsertException(message='角色名称标识')
     try:
-        db.add(Role(role_name=data.role_name, role_code=data.role_code, is_status='1' if data.is_status else '0',
-                    description=None if data.description == '' or data.description is None else data.description))
+        role_info = Role(role_name=role.role_name, role_code=role.role_code, is_status='1' if role.is_status else '0',
+                         description=None if role.description == '' or role.description is None else role.description)
+        db.add(role_info)
         db.commit()
+        for id in ids:
+            db.add(Role_Menu(role_id=role_info.role_id, menu_id=id))
+            db.commit()
         return Result(message='添加成功')
     except:
         db.rollback()
@@ -84,17 +91,41 @@ async def batch_delete(data: list[int]):
 
 
 @router.put('/update', response_model=Result, summary='修改角色')
-async def update(data: VORole):
-    if db.query(Role).filter(Role.role_name == data.role_name).first():
+async def update(data: BORole):
+    role: VORole = data.role
+    ids: list[int] = data.menu_ids
+    temp_name_id = db.query(Role).filter(Role.role_id == role.role_id).first()
+    if db.query(Role).filter(Role.role_name == role.role_name).first() and temp_name_id.role_name != role.role_name:
         raise InsertException(message='角色名称重复')
-    if db.query(Role).filter(Role.role_code == data.role_code).first():
-        raise InsertException(message='角色名称标识')
+    if db.query(Role).filter(Role.role_code == role.role_code).first() and temp_name_id.role_code != role.role_code:
+        raise InsertException(message='角色标识重复')
+    try:
+        raw = db.query(Role).filter(Role.role_id == role.role_id).first()
+        raw.role_name = role.role_name
+        raw.role_code = role.role_code
+        raw.is_status = '1' if role.is_status else '0'
+        raw.description = role.description
+        ids_all = [i.menu_id for i in db.query(Role_Menu).filter(Role_Menu.role_id == role.role_id).all()]
+        add_ids = [i for i in (ids + ids_all) if i not in ids_all]
+        delete_ids = [i for i in ids_all if i not in [x for x in ids if x in ids_all]]
+        if delete_ids:
+            db.query(Role_Menu).filter(Role_Menu.menu_id.in_(delete_ids), Role_Menu.role_id == role.role_id).delete()
+        for id in add_ids:
+            db.add(Role_Menu(role_id=role.role_id, menu_id=id))
+        if add_ids or delete_ids:
+            raw.update_time = func.now()
+        db.commit()
+        return Result(message='修改成功')
+    except:
+        db.rollback()
+        raise UpdateException()
+
+
+@router.put('/update/status', response_model=Result, summary='修改角色状态')
+async def update(data: VORole):
     try:
         raw = db.query(Role).filter(Role.role_id == data.role_id).first()
-        raw.role_name = data.role_name
-        raw.role_code = data.role_code
         raw.is_status = '1' if data.is_status else '0'
-        raw.description = data.description
         db.commit()
         return Result(message='修改成功')
     except:

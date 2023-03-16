@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from database.mysql import get_db
 from exception.custom import QueryException, UpdateException, DeleteException, InsertException
 from filter.menu import filter_menu_to_tree
-from models import Menu
+from models import Menu, Role_Menu
 from schemas.menu import VOMenu, VOMenuTree
 from schemas.result import Result, Page
 
@@ -18,6 +18,18 @@ async def get_all():
         return Result(content=db.query(Menu).all(), message='查询成功')
     except:
         raise QueryException()
+
+
+@router.get('/role_id/{role_id}', response_model=Result[list[VOMenu]], summary='获取菜单(通过角色ID)')
+async def get_all(role_id: int):
+    try:
+        role_menus = db.query(Role_Menu).filter(Role_Menu.role_id == role_id).all()
+        rms: list[int] = []
+        for rm in role_menus:
+            rms.append(rm.menu_id)
+        return Result(content=db.query(Menu).filter(Menu.menu_id.in_(rms)).all(), message='查询成功')
+    except:
+        raise QueryException(code=400, message='查询失败')
 
 
 @router.get('/list/tree', response_model=Result[list[VOMenuTree]], summary='获取所有菜单(树)')

@@ -15,3 +15,12 @@ class VORole(BaseModel):
     class Config:
         orm_mode = True
         arbitrary_types_allowed = True
+
+
+class BORole(BaseModel):
+    role: VORole = None
+    menu_ids: list[int] = None
+
+    class Config:
+        orm_mode = True
+        arbitrary_types_allowed = True

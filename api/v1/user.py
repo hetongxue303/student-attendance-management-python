@@ -20,7 +20,7 @@ async def get_all():
         raise QueryException()
 
 
-@router.get('/list/teacher', response_model=Result[list[BOUser]], summary='获取所有用户')
+@router.get('/list/teacher', response_model=Result[list[BOUser]], summary='获取所有教师')
 async def get_by_username(username: str):
     try:
         user = db.query(User).filter(User.username == username).first()
