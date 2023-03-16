@@ -6,7 +6,7 @@ from database.mysql import get_db
 from exception.custom import QueryException, UpdateException, DeleteException, InsertException
 from models import User, User_Role, Student_Classes
 from schemas.result import Result, Page
-from schemas.user import BOUser, VOUser
+from schemas.user import BOUser, DTOUser
 
 router = APIRouter()
 db: Session = next(get_db())
@@ -32,44 +32,67 @@ async def get_by_username(username: str):
         raise QueryException()
 
 
-@router.get('/list', response_model=Result[Page[list[BOUser]]], summary='获取所有用户(分页)')
+@router.get('/list', response_model=Result[Page[list[DTOUser]]], summary='获取所有用户(分页)')
 async def get_page(page: int, size: int, username: str = None, real_name: str = None):
     try:
         if real_name and username:
             total = db.query(User).filter(User.real_name.like('%{0}%'.format(real_name)),
                                           User.username.like('%{0}%'.format(username))).count()
-            record = db.query(User).filter(User.real_name.like('%{0}%'.format(real_name)),
-                                           User.username.like('%{0}%'.format(username))).limit(size).offset(
+            temp = db.query(User).filter(User.real_name.like('%{0}%'.format(real_name)),
+                                         User.username.like('%{0}%'.format(username))).limit(size).offset(
                 (page - 1) * size).all()
+            record: list[DTOUser] = []
+            for item in temp:
+                tmp: DTOUser | User = item
+                tmp.role_id = db.query(User_Role).filter(User_Role.user_id == item.user_id).first().role_id
+                record.append(tmp)
             return Result(content=Page(total=total, record=record), message='查询成功')
 
         if real_name:
             total = db.query(User).filter(User.real_name.like('%{0}%'.format(real_name))).count()
-            record = db.query(User).filter(User.real_name.like('%{0}%'.format(real_name))).limit(
+            temp = db.query(User).filter(User.real_name.like('%{0}%'.format(real_name))).limit(
                 size).offset((page - 1) * size).all()
+            record: list[DTOUser] = []
+            for item in temp:
+                tmp: DTOUser | User = item
+                tmp.role_id = db.query(User_Role).filter(User_Role.user_id == item.user_id).first().role_id
+                record.append(tmp)
             return Result(content=Page(total=total, record=record), message='查询成功')
 
         if username:
             total = db.query(User).filter(User.username.like('%{0}%'.format(username))).count()
-            record = db.query(User).filter(User.username.like('%{0}%'.format(username))).limit(
+            temp = db.query(User).filter(User.username.like('%{0}%'.format(username))).limit(
                 size).offset((page - 1) * size).all()
+            record: list[DTOUser] = []
+            for item in temp:
+                tmp: DTOUser | User = item
+                tmp.role_id = db.query(User_Role).filter(User_Role.user_id == item.user_id).first().role_id
+                record.append(tmp)
             return Result(content=Page(total=total, record=record), message='查询成功')
 
         total = db.query(User).count()
-        record = db.query(User).limit(size).offset((page - 1) * size).all()
+        temp = db.query(User).limit(size).offset((page - 1) * size).all()
+        record: list[DTOUser] = []
+        for item in temp:
+            tmp: DTOUser | User = item
+            tmp.role_id = db.query(User_Role).filter(User_Role.user_id == item.user_id).first().role_id
+            record.append(tmp)
         return Result(content=Page(total=total, record=record), message='查询成功')
     except:
         raise QueryException()
 
 
 @router.post('/add', response_model=Result, summary='添加用户')
-async def insert(data: VOUser):
+async def insert(data: DTOUser):
     if db.query(User).filter(User.username == data.username).first():
         raise InsertException(message='用户名已存在')
     try:
-        db.add(User(username=data.username, real_name=data.real_name, gender=data.gender.__str__(),
+        user = User(username=data.username, real_name=data.real_name, gender=data.gender.__str__(),
                     is_status='1' if data.is_status else '0', password=get_password_hash(data.password),
-                    description=None if data.description == '' or data.description is None else data.description))
+                    description=None if data.description == '' or data.description is None else data.description)
+        db.add(user)
+        db.commit()
+        db.add(User_Role(user_id=user.user_id, role_id=data.role_id))
         db.commit()
         return Result(message='添加成功')
     except:
@@ -111,14 +134,16 @@ async def batch_delete(data: list[int]):
 
 
 @router.put('/update', response_model=Result, summary='修改用户')
-async def update(data: BOUser):
+async def update(data: DTOUser):
     try:
         raw = db.query(User).filter(User.user_id == data.user_id).first()
+        temp = db.query(User_Role).filter(User_Role.user_id == data.user_id).first()
         raw.real_name = data.real_name
         raw.gender = data.gender.__str__()
         raw.is_status = '1' if data.is_status else '0'
         raw.is_admin = '1' if data.is_admin else '0'
         raw.description = data.description
+        temp.role_id = data.role_id
         db.commit()
         return Result(message='修改成功')
     except:

@@ -21,3 +21,7 @@ class BOUser(BaseModel):
 
 class VOUser(BOUser):
     password: str = None
+
+
+class DTOUser(VOUser):
+    role_id: int = None
