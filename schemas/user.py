@@ -25,3 +25,19 @@ class VOUser(BOUser):
 
 class DTOUser(VOUser):
     role_id: int = None
+
+
+class VOTeacher(BOUser):
+    pass
+
+
+class DTOTeacher(BOUser):
+    password: str = None
+
+
+class VOStudent(BOUser):
+    pass
+
+
+class DTOStudent(BOUser):
+    password: str = None

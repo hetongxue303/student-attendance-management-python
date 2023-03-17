@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from database.mysql import get_db
 from exception.custom import QueryException, UpdateException, DeleteException, InsertException
-from models import Course, User, User_Course
+from models import Course, User_Course, Choice
 from schemas.course import VOCourse, BOCourse
 from schemas.result import Result, Page
 from schemas.token import VOLogin
@@ -24,31 +24,50 @@ async def get_all():
 @router.get('/list/me', response_model=Result[Page[list[VOCourse]]], summary='我的课程(分页)')
 async def get_course_me(page: int, size: int, username: str, course_name: str = None):
     try:
-        user: User = db.query(User).filter(User.username == username).first()
-        if course_name:
-            if bool(int(user.is_admin)):
-                total = db.query(Course).filter(Course.course_name.like('%{0}%'.format(course_name))).count()
-                record = db.query(Course).filter(Course.course_name.like('%{0}%'.format(course_name))).limit(
-                    size).offset((page - 1) * size).all()
-                return Result(content=Page(total=total, record=record), message='查询成功')
-            temp: list = db.query(User_Course).filter(User_Course.user_id == user.user_id).all()
-            ids: list[int] = [item.course_id for item in temp]
-            total = db.query(Course).filter(Course.course_id.in_(ids),
-                                            Course.course_name.like('%{0}%'.format(course_name))).count()
-            record = db.query(Course).filter(Course.course_id.in_(ids),
-                                             Course.course_name.like('%{0}%'.format(course_name))).limit(
-                size).offset((page - 1) * size).all()
-            return Result(content=Page(total=total, record=record), message='查询成功')
+        userinfo: VOLogin = await get_userinfo()
+        if userinfo.username == username:
+            if userinfo.is_admin:
+                return Result(content=Page(total=0, record=[]), message='查询成功')
+            elif 'teacher' in userinfo.roles:
+                if course_name:
+                    uc = db.query(User_Course).filter(User_Course.user_id == userinfo.user_id).all()
+                    course_ids: list[int] = [] if not uc else [item.course_id for item in uc]
+                    if course_ids:
+                        record = db.query(Course).filter(Course.course_id.in_(course_ids),
+                                                         Course.course_name.like('%{0}%'.format(course_name))).limit(
+                            size).offset((page - 1) * size).all()
+                        total = db.query(Course).filter(Course.course_id.in_(course_ids)).count()
+                        return Result(content=Page(total=total, record=record), message='查询成功')
+                    return Result(content=Page(total=0, record=[]), message='查询成功')
 
-        if bool(int(user.is_admin)):
-            total = db.query(Course).count()
-            record = db.query(Course).limit(size).offset((page - 1) * size).all()
-            return Result(content=Page(total=total, record=record), message='查询成功')
-        temp: list = db.query(User_Course).filter(User_Course.user_id == user.user_id).all()
-        ids: list[int] = [item.course_id for item in temp]
-        total = db.query(Course).filter(Course.course_id.in_(ids)).count()
-        record = db.query(Course).filter(Course.course_id.in_(ids)).limit(size).offset((page - 1) * size).all()
-        return Result(content=Page(total=total, record=record), message='查询成功')
+                uc = db.query(User_Course).filter(User_Course.user_id == userinfo.user_id).all()
+                course_ids: list[int] = [] if not uc else [item.course_id for item in uc]
+                if course_ids:
+                    record = db.query(Course).filter(Course.course_id.in_(course_ids)).limit(size).offset(
+                        (page - 1) * size).all()
+                    total = db.query(Course).filter(Course.course_id.in_(course_ids)).count()
+                    return Result(content=Page(total=total, record=record), message='查询成功')
+                return Result(content=Page(total=0, record=[]), message='查询成功')
+            else:
+                if course_name:
+                    choice = db.query(Choice).filter(Choice.user_id == userinfo.user_id).all()
+                    course_ids: list[int] = [] if not choice else [item.course_id for item in choice]
+                    if course_ids:
+                        record = db.query(Course).filter(Course.course_id.in_(course_ids),
+                                                         Course.course_name.like('%{0}%'.format(course_name))).limit(
+                            size).offset((page - 1) * size).all()
+                        total = db.query(Course).filter(Course.course_id.in_(course_ids)).count()
+                        return Result(content=Page(total=total, record=record), message='查询成功')
+                    return Result(content=Page(total=0, record=[]), message='查询成功')
+
+                choice = db.query(Choice).filter(Choice.user_id == userinfo.user_id).all()
+                course_ids: list[int] = [] if not choice else [item.course_id for item in choice]
+                if course_ids:
+                    record = db.query(Course).filter(Course.course_id.in_(course_ids)).limit(size).offset(
+                        (page - 1) * size).all()
+                    total = db.query(Course).filter(Course.course_id.in_(course_ids)).count()
+                    return Result(content=Page(total=total, record=record), message='查询成功')
+                return Result(content=Page(total=0, record=[]), message='查询成功')
     except:
         raise QueryException()
 

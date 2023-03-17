@@ -14,4 +14,5 @@ from models.course import *
 from models.user_course import *
 from models.attendance import *
 from models.check import *
+from models.choice import *
 from models.student_classes import *

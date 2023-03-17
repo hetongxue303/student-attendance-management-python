@@ -18,6 +18,7 @@ class VOCourse(BaseModel):
     classes_id: int = None
     classes: VOClasses = None
     count: int = None
+    selection: int = None
     time: int = None
     description: str = None
     create_time: datetime = None

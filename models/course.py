@@ -21,6 +21,8 @@ class Course(Base):
 
     count = Column(Integer, nullable=False, comment='课程人数')
 
+    selection = Column(Integer, server_default='0', comment='已选人数')
+
     time = Column(Integer, nullable=False, comment='课程课时')
 
     description = Column(String(500), server_default='空', comment='课程描述')
