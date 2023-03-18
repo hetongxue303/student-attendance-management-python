@@ -4,8 +4,9 @@ from sqlalchemy.orm import sessionmaker
 from core.config import settings
 from core.logger import logger
 from database.data import user_data, role_data, menu_data, user_role_data, role_menu_data, college_data, major_data, \
-    classes_data, student_classes_data, course_data, user_course_data
-from models import User, Role, Menu, User_Role, Role_Menu, College, Major, Classes, Student_Classes, Course, User_Course
+    classes_data, student_classes_data, course_data, teacher_course_data
+from models import User, Role, Menu, User_Role, Role_Menu, College, Major, Classes, Student_Classes, Course, \
+    Teacher_Course
 from models.base import Base
 
 engine = create_engine(
@@ -67,7 +68,7 @@ def init_data():
         engine.execute(Major.__table__.insert(), [major for major in major_data])
         engine.execute(Classes.__table__.insert(), [classes for classes in classes_data])
         engine.execute(Course.__table__.insert(), [course for course in course_data])
-        engine.execute(User_Course.__table__.insert(), [uc for uc in user_course_data])
+        engine.execute(Teacher_Course.__table__.insert(), [uc for uc in teacher_course_data])
         engine.execute(Student_Classes.__table__.insert(), [sc for sc in student_classes_data])
         logger.success('表数据初始化完成')
     except Exception as e:

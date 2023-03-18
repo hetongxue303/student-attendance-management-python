@@ -16,5 +16,5 @@ class Choice(Base):
 
     score = Column(DECIMAL(4, 1), server_default='0', comment='课程成绩')
 
-    choice_status = Column(Enum('1', '2', '3'), nullable=False, server_default='1',
-                           comment='选课状态(1未处理 2已同意 3已拒绝)')
+    choice_status = Column(Enum('-1', '0', '1'), nullable=False, server_default='-1',
+                           comment='选课状态(-1未处理 1已同意 0已拒绝)')

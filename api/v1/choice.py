@@ -3,8 +3,8 @@ from sqlalchemy.orm import Session
 
 from database.mysql import get_db
 from exception.custom import UpdateException, DeleteException, InsertException, QueryException
-from models import Choice, Course
-from schemas.choice import VOChoice
+from models import Choice, Course, Teacher_Course
+from schemas.choice import VOChoice, VOChoiceBatch
 from schemas.result import Result, Page
 from schemas.token import VOLogin
 from utils.redis import get_userinfo
@@ -22,11 +22,44 @@ async def get_all():
 
 
 @router.get('/list', response_model=Result[Page[list[VOChoice]]], summary='获取所有选课(分页)')
-async def get_page(page: int, size: int):
+async def get_page(page: int, size: int, course_name: str = None):
     try:
-        total = db.query(Choice).count()
-        record = db.query(Choice).limit(size).offset((page - 1) * size).all()
-        return Result(content=Page(total=total, record=record), message='查询成功')
+        # 只能查询自己的课程的选课 管理员除外
+        userinfo: VOLogin = await get_userinfo()
+        if userinfo.is_admin:
+            if course_name:
+                course = db.query(Course).filter(Course.course_name.like('%{0}%'.format(course_name)))
+                if course:
+                    ids = [item.course_id for item in course]
+                    total = db.query(Choice).filter(Choice.choice_status == '-1', Choice.course_id.in_(ids)).count()
+                    record = db.query(Choice).filter(Choice.choice_status == '-1', Choice.course_id.in_(ids)).limit(
+                        size).offset((page - 1) * size).all()
+                    return Result(content=Page(total=total, record=record), message='查询成功')
+                return Result(content=Page(total=0, record=[]), message='查询成功')
+            total = db.query(Choice).filter(Choice.choice_status == '-1').count()
+            record = db.query(Choice).filter(Choice.choice_status == '-1').limit(size).offset((page - 1) * size).all()
+            return Result(content=Page(total=total, record=record), message='查询成功')
+
+        tc = db.query(Teacher_Course).filter(Teacher_Course.user_id == userinfo.user_id).all()
+        if tc:
+            if course_name:
+                course_ids = [item.course_id for item in tc]
+                course = db.query(Course).filter(Course.course_name.like('%{0}%'.format(course_name)),
+                                                 Course.course_id.in_(course_ids))
+                if course:
+                    ids = [item.course_id for item in course]
+                    total = db.query(Choice).filter(Choice.choice_status == '-1', Choice.choice_id.in_(ids)).count()
+                    record = db.query(Choice).filter(Choice.choice_status == '-1', Choice.choice_id.in_(ids)).limit(
+                        size).offset((page - 1) * size).all()
+                    return Result(content=Page(total=total, record=record), message='查询成功')
+                return Result(content=Page(total=0, record=[]), message='查询成功')
+            ids = [item.course_id for item in tc]
+            total = db.query(Choice).filter(Choice.choice_status == '-1', Choice.choice_id.in_(ids)).count()
+            record = db.query(Choice).filter(Choice.choice_status == '-1', Choice.choice_id.in_(ids)).limit(
+                size).offset((page - 1) * size).all()
+            return Result(content=Page(total=total, record=record), message='查询成功')
+        return Result(content=Page(total=0, record=[]), message='查询成功')
+
     except:
         raise QueryException()
 
@@ -44,7 +77,7 @@ async def insert(data: VOChoice):
     if course.count == course.selection:
         raise InsertException(message='该课程人数已满')
     try:
-        # 数量减一
+        # 选课人数加一
         course.selection = course.selection + 1
         db.add(Choice(user_id=userinfo.user_id, course_id=data.course_id))
         db.commit()
@@ -91,10 +124,9 @@ async def update(data: VOChoice):
 
 
 @router.put('/update/score', response_model=Result, summary='修改选课成绩')
-async def update(data: VOChoice):
+async def update_score(data: VOChoice):
     try:
         raw = db.query(Choice).filter(Choice.choice_id == data.choice_id).first()
-        print(raw.choice_id)
         raw.score = data.score
         db.commit()
         return Result(message='修改成功')
@@ -104,11 +136,25 @@ async def update(data: VOChoice):
 
 
 @router.put('/update/status', response_model=Result, summary='修改选课状态')
-async def update(data: VOChoice):
+async def update_status(data: VOChoice):
     try:
         raw = db.query(Choice).filter(Choice.choice_id == data.choice_id).first()
         raw.choice_status = data.choice_status.__str__()
         db.commit()
+        return Result(message='修改成功')
+    except:
+        db.rollback()
+        raise UpdateException()
+
+
+@router.put('/update/status/batch', response_model=Result, summary='修改选课状态(批量)')
+async def batch_update_batch(data: VOChoiceBatch):
+    try:
+        print(data)
+        temp = db.query(Choice).filter(Choice.choice_id.in_(data.ids)).all()
+        for item in temp:
+            item.choice_status = data.choice_status.__str__()
+            db.commit()
         return Result(message='修改成功')
     except:
         db.rollback()

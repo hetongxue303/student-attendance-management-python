@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from database.mysql import get_db
 from exception.custom import QueryException, UpdateException, DeleteException, InsertException
-from models import Course, User_Course, Choice
+from models import Course, Teacher_Course, Choice
 from schemas.course import VOCourse, BOCourse
 from schemas.result import Result, Page
 from schemas.token import VOLogin
@@ -30,7 +30,7 @@ async def get_course_me(page: int, size: int, username: str, course_name: str = 
                 return Result(content=Page(total=0, record=[]), message='查询成功')
             elif 'teacher' in userinfo.roles:
                 if course_name:
-                    uc = db.query(User_Course).filter(User_Course.user_id == userinfo.user_id).all()
+                    uc = db.query(Teacher_Course).filter(Teacher_Course.user_id == userinfo.user_id).all()
                     course_ids: list[int] = [] if not uc else [item.course_id for item in uc]
                     if course_ids:
                         record = db.query(Course).filter(Course.course_id.in_(course_ids),
@@ -40,7 +40,7 @@ async def get_course_me(page: int, size: int, username: str, course_name: str = 
                         return Result(content=Page(total=total, record=record), message='查询成功')
                     return Result(content=Page(total=0, record=[]), message='查询成功')
 
-                uc = db.query(User_Course).filter(User_Course.user_id == userinfo.user_id).all()
+                uc = db.query(Teacher_Course).filter(Teacher_Course.user_id == userinfo.user_id).all()
                 course_ids: list[int] = [] if not uc else [item.course_id for item in uc]
                 if course_ids:
                     record = db.query(Course).filter(Course.course_id.in_(course_ids)).limit(size).offset(
@@ -96,7 +96,7 @@ async def insert(data: BOCourse):
                         description=None if data.description == '' or data.description is None else data.description)
         db.add(course)
         db.commit()
-        db.add(User_Course(user_id=data.user_id, course_id=course.course_id))
+        db.add(Teacher_Course(user_id=data.user_id, course_id=course.course_id))
         db.commit()
         return Result(message='添加成功')
     except:
@@ -109,7 +109,8 @@ async def delete(id: int):
     try:
         userinfo: VOLogin = await get_userinfo()
         db.query(Course).filter(Course.course_id == id).delete()
-        db.query(User_Course).filter(User_Course.course_id == id, User_Course.user_id == userinfo.user_id).delete()
+        db.query(Teacher_Course).filter(Teacher_Course.course_id == id,
+                                        Teacher_Course.user_id == userinfo.user_id).delete()
         db.commit()
         return Result(message='删除成功')
     except:
@@ -139,7 +140,7 @@ async def update(data: BOCourse):
         raw.count = data.count
         raw.time = data.time
         raw.description = data.description
-        temp = db.query(User_Course).filter(User_Course.course_id == data.course_id).first()
+        temp = db.query(Teacher_Course).filter(Teacher_Course.course_id == data.course_id).first()
         temp.user_id = data.user_id
         db.commit()
         return Result(message='修改成功')
