@@ -45,45 +45,55 @@ async def get_by_username(username: str):
             return Result(content=db.query(User).filter(User.user_id.in_(ids)).all(), message='查询成功')
     except:
         raise QueryException()
+@router.get('/list/teacher', response_model=Result[list[BOUser]], summary='获取所有教师')
+async def get_by_username(username: str):
+    try:
+        user = db.query(User).filter(User.username == username).first()
+        temp = db.query(User_Role).filter(User_Role.role_id == 2).all()
+        ids = [item.user_id for item in temp]
+        if bool(int(user.is_admin)):
+            return Result(content=db.query(User).filter(User.user_id.in_(ids)).all(), message='查询成功')
+    except:
+        raise QueryException()
 
 
 @router.get('/list', response_model=Result[Page[list[DTOUser]]], summary='获取所有用户(分页)')
 async def get_page(page: int, size: int, username: str = None, real_name: str = None):
     try:
-        # if real_name and username:
-        #     total = db.query(User).filter(User.real_name.like('%{0}%'.format(real_name)),
-        #                                   User.username.like('%{0}%'.format(username))).count()
-        #     temp = db.query(User).filter(User.real_name.like('%{0}%'.format(real_name)),
-        #                                  User.username.like('%{0}%'.format(username))).limit(size).offset(
-        #         (page - 1) * size).all()
-        #     record: list[DTOUser] = []
-        #     for item in temp:
-        #         tmp: DTOUser | User = item
-        #         tmp.role_id = db.query(User_Role).filter(User_Role.user_id == item.user_id).first().role_id
-        #         record.append(tmp)
-        #     return Result(content=Page(total=total, record=record), message='查询成功')
-        #
-        # if real_name:
-        #     total = db.query(User).filter(User.real_name.like('%{0}%'.format(real_name))).count()
-        #     temp = db.query(User).filter(User.real_name.like('%{0}%'.format(real_name))).limit(
-        #         size).offset((page - 1) * size).all()
-        #     record: list[DTOUser] = []
-        #     for item in temp:
-        #         tmp: DTOUser | User = item
-        #         tmp.role_id = db.query(User_Role).filter(User_Role.user_id == item.user_id).first().role_id
-        #         record.append(tmp)
-        #     return Result(content=Page(total=total, record=record), message='查询成功')
-        #
-        # if username:
-        #     total = db.query(User).filter(User.username.like('%{0}%'.format(username))).count()
-        #     temp = db.query(User).filter(User.username.like('%{0}%'.format(username))).limit(
-        #         size).offset((page - 1) * size).all()
-        #     record: list[DTOUser] = []
-        #     for item in temp:
-        #         tmp: DTOUser | User = item
-        #         tmp.role_id = db.query(User_Role).filter(User_Role.user_id == item.user_id).first().role_id
-        #         record.append(tmp)
-        #     return Result(content=Page(total=total, record=record), message='查询成功')
+        if real_name and username:
+            total = db.query(User).filter(User.real_name.like('%{0}%'.format(real_name)),
+                                          User.username.like('%{0}%'.format(username))).count()
+            temp = db.query(User).filter(User.real_name.like('%{0}%'.format(real_name)),
+                                         User.username.like('%{0}%'.format(username))).limit(size).offset(
+                (page - 1) * size).all()
+            record: list[DTOUser] = []
+            for item in temp:
+                tmp: DTOUser | User = item
+                tmp.role_id = db.query(User_Role).filter(User_Role.user_id == item.user_id).first().role_id
+                record.append(tmp)
+            return Result(content=Page(total=total, record=record), message='查询成功')
+
+        if real_name:
+            total = db.query(User).filter(User.real_name.like('%{0}%'.format(real_name))).count()
+            temp = db.query(User).filter(User.real_name.like('%{0}%'.format(real_name))).limit(
+                size).offset((page - 1) * size).all()
+            record: list[DTOUser] = []
+            for item in temp:
+                tmp: DTOUser | User = item
+                tmp.role_id = db.query(User_Role).filter(User_Role.user_id == item.user_id).first().role_id
+                record.append(tmp)
+            return Result(content=Page(total=total, record=record), message='查询成功')
+
+        if username:
+            total = db.query(User).filter(User.username.like('%{0}%'.format(username))).count()
+            temp = db.query(User).filter(User.username.like('%{0}%'.format(username))).limit(
+                size).offset((page - 1) * size).all()
+            record: list[DTOUser] = []
+            for item in temp:
+                tmp: DTOUser | User = item
+                tmp.role_id = db.query(User_Role).filter(User_Role.user_id == item.user_id).first().role_id
+                record.append(tmp)
+            return Result(content=Page(total=total, record=record), message='查询成功')
 
         total = db.query(User).count()
         record = db.query(User).limit(size).offset((page - 1) * size).all()

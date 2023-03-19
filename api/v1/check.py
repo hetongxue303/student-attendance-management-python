@@ -3,9 +3,12 @@ from sqlalchemy.orm import Session
 
 from database.mysql import get_db
 from exception.custom import UpdateException, DeleteException, InsertException, QueryException
-from models import Check
+from models import Check, Choice, Attendance
+from schemas.attendance import BOAttendance
 from schemas.check import VOCheck
 from schemas.result import Result, Page
+from schemas.token import VOLogin
+from utils.redis import get_userinfo
 
 router = APIRouter()
 db: Session = next(get_db())
@@ -15,6 +18,28 @@ db: Session = next(get_db())
 async def get_all():
     try:
         return Result(content=db.query(Check).all(), message='查询成功')
+    except:
+        raise QueryException()
+
+
+@router.get('/list/student', response_model=Result[Page[list[BOAttendance]]], summary='获取签到信息(自己的)')
+async def get_all(page: int, size: int):
+    try:
+        # TODO 每次查之前 清空到期的
+        userinfo: VOLogin = await get_userinfo()
+        choice = db.query(Choice).filter(Choice.user_id == userinfo.user_id).all()
+        if choice:
+            ids = [item.course_id for item in choice]
+            total = db.query(Attendance).filter(Attendance.course_id.in_(ids), Attendance.status == '0').count()
+            record = db.query(Attendance).filter(Attendance.course_id.in_(ids), Attendance.status == '0').limit(
+                size).offset((page - 1) * size).all()
+            for item in record:
+                check = db.query(Check).filter(Check.attendance_id == item.attendance_id,
+                                               Check.user_id == userinfo.user_id,
+                                               Check.course_id == item.course_id).first()
+                item.is_checked = True if check else False
+            return Result(content=Page(total=total, record=record), message='查询成功')
+        return Result(content=Page(total=0, record=[]), message='查询成功')
     except:
         raise QueryException()
 
@@ -32,7 +57,8 @@ async def get_page(page: int, size: int):
 @router.post('/add', response_model=Result, summary='添加签到记录')
 async def insert(data: VOCheck):
     try:
-        db.add(Check(user_id=data.user_id, course_id=data.course_id, attendance_id=data.attendance_id))
+        userinfo: VOLogin = await get_userinfo()
+        db.add(Check(user_id=userinfo.user_id, course_id=data.course_id, attendance_id=data.attendance_id))
         db.commit()
         return Result(message='添加成功')
     except:

@@ -80,57 +80,62 @@ menu_data = [
     },
     {
         'parent_id': 6, 'menu_title': '发布签到', 'menu_type': '2', 'router_name': 'publish', 'sub_count': 0,
-        'router_path': '/attendance/publish', 'component': 'attendance/publish/index.vue', 'sort': 7, 'icon': 'index',
+        'router_path': '/attendance/publish', 'component': 'attendance/publish/index.vue', 'sort': 8, 'icon': 'index',
         'permission': 'attendance:publish:list', 'is_show': '1', 'is_sub': '0'
     },
     {
+        'parent_id': 6, 'menu_title': '学生签到', 'menu_type': '2', 'router_name': 'att_student', 'sub_count': 0,
+        'router_path': '/attendance/student', 'component': 'attendance/student/index.vue', 'sort': 8, 'icon': 'index',
+        'permission': 'attendance:student:list', 'is_show': '1', 'is_sub': '0'
+    },
+    {
         'parent_id': 6, 'menu_title': '签到记录', 'menu_type': '2', 'router_name': 'record', 'sub_count': 0,
-        'router_path': '/attendance/record', 'component': 'attendance/record/index.vue', 'sort': 8, 'icon': 'index',
+        'router_path': '/attendance/record', 'component': 'attendance/record/index.vue', 'sort': 9, 'icon': 'index',
         'permission': 'attendance:record:list', 'is_show': '1', 'is_sub': '0'
     },
     {
         'parent_id': 0, 'menu_title': '校园管理', 'menu_type': '1', 'router_name': 'school', 'sub_count': 3,
-        'router_path': '/school', 'component': '', 'sort': 9, 'icon': 'index',
+        'router_path': '/school', 'component': '', 'sort': 10, 'icon': 'index',
         'permission': '', 'is_show': '1', 'is_sub': '1'
     },
     {
-        'parent_id': 9, 'menu_title': '班级管理', 'menu_type': '2', 'router_name': 'publish', 'sub_count': 0,
-        'router_path': '/school/classes', 'component': 'school/classes/index.vue', 'sort': 10, 'icon': 'index',
+        'parent_id': 10, 'menu_title': '班级管理', 'menu_type': '2', 'router_name': 'publish', 'sub_count': 0,
+        'router_path': '/school/classes', 'component': 'school/classes/index.vue', 'sort': 11, 'icon': 'index',
         'permission': 'school:classes:list', 'is_show': '1', 'is_sub': '0'
     },
     {
-        'parent_id': 9, 'menu_title': '专业管理', 'menu_type': '2', 'router_name': 'major', 'sub_count': 0,
-        'router_path': '/school/major', 'component': 'school/major/index.vue', 'sort': 11, 'icon': 'index',
+        'parent_id': 10, 'menu_title': '专业管理', 'menu_type': '2', 'router_name': 'major', 'sub_count': 0,
+        'router_path': '/school/major', 'component': 'school/major/index.vue', 'sort': 12, 'icon': 'index',
         'permission': 'school:major:list', 'is_show': '1', 'is_sub': '0'
     },
     {
-        'parent_id': 9, 'menu_title': '学院管理', 'menu_type': '2', 'router_name': 'college', 'sub_count': 0,
-        'router_path': '/school/college', 'component': 'school/college/index.vue', 'sort': 12, 'icon': 'index',
+        'parent_id': 10, 'menu_title': '学院管理', 'menu_type': '2', 'router_name': 'college', 'sub_count': 0,
+        'router_path': '/school/college', 'component': 'school/college/index.vue', 'sort': 13, 'icon': 'index',
         'permission': 'school:college:list', 'is_show': '1', 'is_sub': '0'
     },
     {
         'parent_id': 0, 'menu_title': '系统管理', 'menu_type': '1', 'router_name': 'system', 'sub_count': 3,
-        'router_path': '/system', 'component': '', 'sort': 13, 'icon': 'index',
+        'router_path': '/system', 'component': '', 'sort': 14, 'icon': 'index',
         'permission': '', 'is_show': '1', 'is_sub': '1'
     },
     {
-        'parent_id': 13, 'menu_title': '用户管理', 'menu_type': '2', 'router_name': 'user', 'sub_count': 0,
-        'router_path': '/system/user', 'component': 'system/user/index.vue', 'sort': 14, 'icon': 'index',
+        'parent_id': 14, 'menu_title': '用户管理', 'menu_type': '2', 'router_name': 'user', 'sub_count': 0,
+        'router_path': '/system/user', 'component': 'system/user/index.vue', 'sort': 15, 'icon': 'index',
         'permission': 'system:user:list', 'is_show': '1', 'is_sub': '0'
     },
     {
-        'parent_id': 13, 'menu_title': '角色管理', 'menu_type': '2', 'router_name': 'role', 'sub_count': 0,
-        'router_path': '/system/role', 'component': 'system/role/index.vue', 'sort': 15, 'icon': 'index',
+        'parent_id': 14, 'menu_title': '角色管理', 'menu_type': '2', 'router_name': 'role', 'sub_count': 0,
+        'router_path': '/system/role', 'component': 'system/role/index.vue', 'sort': 16, 'icon': 'index',
         'permission': 'system:role:list', 'is_show': '1', 'is_sub': '0'
     },
     {
-        'parent_id': 13, 'menu_title': '菜单管理', 'menu_type': '2', 'router_name': 'menu', 'sub_count': 0,
-        'router_path': '/system/menu', 'component': 'system/menu/index.vue', 'sort': 16, 'icon': 'index',
+        'parent_id': 14, 'menu_title': '菜单管理', 'menu_type': '2', 'router_name': 'menu', 'sub_count': 0,
+        'router_path': '/system/menu', 'component': 'system/menu/index.vue', 'sort': 17, 'icon': 'index',
         'permission': 'system:menu:list', 'is_show': '1', 'is_sub': '0'
     },
     {
         'parent_id': 0, 'menu_title': '关于系统', 'menu_type': '1', 'router_name': 'about', 'sub_count': 0,
-        'router_path': '/about', 'component': '', 'sort': 17, 'icon': 'index',
+        'router_path': '/about', 'component': '', 'sort': 18, 'icon': 'index',
         'permission': '', 'is_show': '1', 'is_sub': '0'
     }
 ]
@@ -161,23 +166,28 @@ role_menu_data = [
     {'role_id': 1, 'menu_id': 15},
     {'role_id': 1, 'menu_id': 16},
     {'role_id': 1, 'menu_id': 17},
+    {'role_id': 1, 'menu_id': 18},
     {'role_id': 2, 'menu_id': 1},
     {'role_id': 2, 'menu_id': 2},
     {'role_id': 2, 'menu_id': 3},
     {'role_id': 2, 'menu_id': 4},
     {'role_id': 2, 'menu_id': 6},
     {'role_id': 2, 'menu_id': 7},
-    {'role_id': 2, 'menu_id': 8},
     {'role_id': 2, 'menu_id': 9},
     {'role_id': 2, 'menu_id': 10},
     {'role_id': 2, 'menu_id': 11},
     {'role_id': 2, 'menu_id': 12},
-    {'role_id': 2, 'menu_id': 17},
+    {'role_id': 2, 'menu_id': 18},
     {'role_id': 3, 'menu_id': 1},
     {'role_id': 3, 'menu_id': 2},
     {'role_id': 3, 'menu_id': 3},
     {'role_id': 3, 'menu_id': 5},
-    {'role_id': 3, 'menu_id': 17}
+    {'role_id': 3, 'menu_id': 6},
+    {'role_id': 3, 'menu_id': 8},
+    {'role_id': 3, 'menu_id': 9},
+    {'role_id': 3, 'menu_id': 10},
+    {'role_id': 3, 'menu_id': 13},
+    {'role_id': 3, 'menu_id': 18}
 ]
 
 college_data = [
@@ -230,5 +240,5 @@ course_data = [
 ]
 
 teacher_course_data = [
-    {'user_id': 2, 'course_id': 1}, {'user_id': 2, 'course_id': 3}
+    {'user_id': 2, 'course_id': 1}, {'user_id': 2, 'course_id': 3}, {'user_id': 5, 'course_id': 2}
 ]

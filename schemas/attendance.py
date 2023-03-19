@@ -25,3 +25,4 @@ class VOAttendance(BaseModel):
 
 class BOAttendance(VOAttendance):
     checked_count: int = None  # 签到人数
+    is_checked: bool = None

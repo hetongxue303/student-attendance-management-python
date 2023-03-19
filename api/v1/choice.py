@@ -26,6 +26,7 @@ async def get_page(page: int, size: int, course_name: str = None):
     try:
         # 只能查询自己的课程的选课 管理员除外
         userinfo: VOLogin = await get_userinfo()
+        # 管理员
         if userinfo.is_admin:
             if course_name:
                 course = db.query(Course).filter(Course.course_name.like('%{0}%'.format(course_name)))
@@ -40,6 +41,7 @@ async def get_page(page: int, size: int, course_name: str = None):
             record = db.query(Choice).filter(Choice.choice_status == '-1').limit(size).offset((page - 1) * size).all()
             return Result(content=Page(total=total, record=record), message='查询成功')
 
+        # 教师
         tc = db.query(Teacher_Course).filter(Teacher_Course.user_id == userinfo.user_id).all()
         if tc:
             if course_name:
@@ -48,14 +50,15 @@ async def get_page(page: int, size: int, course_name: str = None):
                                                  Course.course_id.in_(course_ids))
                 if course:
                     ids = [item.course_id for item in course]
-                    total = db.query(Choice).filter(Choice.choice_status == '-1', Choice.choice_id.in_(ids)).count()
-                    record = db.query(Choice).filter(Choice.choice_status == '-1', Choice.choice_id.in_(ids)).limit(
+                    total = db.query(Choice).filter(Choice.choice_status == '-1', Choice.course_id.in_(ids)).count()
+                    record = db.query(Choice).filter(Choice.choice_status == '-1', Choice.course_id.in_(ids)).limit(
                         size).offset((page - 1) * size).all()
                     return Result(content=Page(total=total, record=record), message='查询成功')
                 return Result(content=Page(total=0, record=[]), message='查询成功')
+
             ids = [item.course_id for item in tc]
-            total = db.query(Choice).filter(Choice.choice_status == '-1', Choice.choice_id.in_(ids)).count()
-            record = db.query(Choice).filter(Choice.choice_status == '-1', Choice.choice_id.in_(ids)).limit(
+            total = db.query(Choice).filter(Choice.choice_status == '-1', Choice.course_id.in_(ids)).count()
+            record = db.query(Choice).filter(Choice.choice_status == '-1', Choice.course_id.in_(ids)).limit(
                 size).offset((page - 1) * size).all()
             return Result(content=Page(total=total, record=record), message='查询成功')
         return Result(content=Page(total=0, record=[]), message='查询成功')

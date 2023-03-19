@@ -14,7 +14,8 @@ class VOCheck(BaseModel):
     course_id: int = None
     course: VOCourse = None
     attendance_id: int = None
-    Attendance: VOAttendance = None
+    attendance: VOAttendance = None
+    status: int = None
     check_time: datetime = None
     create_time: datetime = None
     update_time: datetime = None

@@ -107,7 +107,7 @@ async def get_course_me(page: int, size: int, username: str, course_name: str = 
         raise QueryException()
 
 
-@router.get('/list', response_model=Result[Page[list[VOCourse]]], summary='获取所有课程(分页)')
+@router.get('/list', response_model=Result[Page[list[VOMyCourse]]], summary='获取所有课程(分页)')
 async def get_page(page: int, size: int, course_name: str = None):
     try:
         if course_name:
@@ -118,6 +118,9 @@ async def get_page(page: int, size: int, course_name: str = None):
 
         total = db.query(Course).count()
         record = db.query(Course).limit(size).offset((page - 1) * size).all()
+        for item in record:
+            user_id = db.query(Teacher_Course).filter(Teacher_Course.course_id == item.course_id).first().user_id
+            item.teacher_name = db.query(User).filter(User.user_id == user_id).first().real_name
         return Result(content=Page(total=total, record=record), message='查询成功')
     except:
         raise QueryException()
