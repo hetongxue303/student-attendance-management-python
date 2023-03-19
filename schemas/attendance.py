@@ -14,9 +14,14 @@ class VOAttendance(BaseModel):
     course: VOCourse = None
     attendance_time: datetime = None
     time: int = None
+    status: int = None
     create_time: datetime = None
     update_time: datetime = None
 
     class Config:
         orm_mode = True
         arbitrary_types_allowed = True
+
+
+class BOAttendance(VOAttendance):
+    checked_count: int = None  # 签到人数

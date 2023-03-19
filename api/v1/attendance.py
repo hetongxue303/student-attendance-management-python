@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from database.mysql import get_db
 from exception.custom import UpdateException, DeleteException, InsertException, QueryException
 from models.attendance import Attendance
-from schemas.attendance import VOAttendance
+from schemas.attendance import VOAttendance, BOAttendance
 from schemas.result import Result, Page
 
 router = APIRouter()
@@ -19,11 +19,15 @@ async def get_all():
         raise QueryException()
 
 
-@router.get('/list', response_model=Result[Page[list[VOAttendance]]], summary='获取所有签到记录(分页)')
-async def get_page(page: int, size: int):
+@router.get('/list', response_model=Result[Page[list[BOAttendance]]], summary='获取所有签到记录(分页)')
+async def get_page(page: int, size: int, status: int = None):
     try:
-        total = db.query(Attendance).count()
-        record = db.query(Attendance).limit(size).offset((page - 1) * size).all()
+        total = db.query(Attendance).filter(Attendance.status == status.__str__()).count()
+        record = db.query(Attendance).filter(Attendance.status == status.__str__()).limit(size).offset(
+            (page - 1) * size).all()
+        for item in record:
+            # TODO 待完善
+            item.checked_count = 1
         return Result(content=Page(total=total, record=record), message='查询成功')
     except:
         raise QueryException()
@@ -70,6 +74,31 @@ async def update(data: VOAttendance):
         raw.course_id = data.course_id
         raw.time = data.time
         db.commit()
+        return Result(message='修改成功')
+    except:
+        db.rollback()
+        raise UpdateException()
+
+
+@router.put('/update/status', response_model=Result, summary='更新签到状态')
+async def update(data: VOAttendance):
+    try:
+        raw = db.query(Attendance).filter(Attendance.attendance_id == data.attendance_id).first()
+        raw.status = '1'
+        db.commit()
+        return Result(message='修改成功')
+    except:
+        db.rollback()
+    raise UpdateException()
+
+
+@router.put('/update/status/batch', response_model=Result, summary='更新签到状态(批量)')
+async def update(data: list[int]):
+    try:
+        raw = db.query(Attendance).filter(Attendance.attendance_id.in_(data)).all()
+        for item in raw:
+            item.status = '1'
+            db.commit()
         return Result(message='修改成功')
     except:
         db.rollback()

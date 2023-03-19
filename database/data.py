@@ -22,6 +22,22 @@ user_data = [
         'gender': '1',
         'is_status': '1',
         'is_admin': '0'
+    },
+    {
+        'username': '2021230523',
+        'password': '$2b$12$q0OSa5wwpo1xkUfRCx2DZuPqWt04CQ.CNR.lV6oGqnpVmww2055Py',
+        'real_name': '周临西',
+        'gender': '1',
+        'is_status': '1',
+        'is_admin': '0'
+    },
+    {
+        'username': '10002',
+        'password': '$2b$12$q0OSa5wwpo1xkUfRCx2DZuPqWt04CQ.CNR.lV6oGqnpVmww2055Py',
+        'real_name': '吴可',
+        'gender': '1',
+        'is_status': '1',
+        'is_admin': '0'
     }
 ]
 
@@ -122,7 +138,9 @@ menu_data = [
 user_role_data = [
     {'user_id': 1, 'role_id': 1},
     {'user_id': 2, 'role_id': 2},
-    {'user_id': 3, 'role_id': 3}
+    {'user_id': 3, 'role_id': 3},
+    {'user_id': 4, 'role_id': 3},
+    {'user_id': 5, 'role_id': 2}
 ]
 
 role_menu_data = [

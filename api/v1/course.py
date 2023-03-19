@@ -3,8 +3,8 @@ from sqlalchemy.orm import Session
 
 from database.mysql import get_db
 from exception.custom import QueryException, UpdateException, DeleteException, InsertException
-from models import Course, Teacher_Course, Choice
-from schemas.course import VOCourse, BOCourse
+from models import Course, Teacher_Course, Choice, User
+from schemas.course import VOCourse, BOCourse, VOMyCourse
 from schemas.result import Result, Page
 from schemas.token import VOLogin
 from utils.redis import get_userinfo
@@ -21,13 +21,15 @@ async def get_all():
         raise QueryException()
 
 
-@router.get('/list/me', response_model=Result[Page[list[VOCourse]]], summary='我的课程(分页)')
+@router.get('/list/me', response_model=Result[Page[list[VOMyCourse]]], summary='我的课程(分页)')
 async def get_course_me(page: int, size: int, username: str, course_name: str = None):
     try:
         userinfo: VOLogin = await get_userinfo()
         if userinfo.username == username:
+            # 管理员
             if userinfo.is_admin:
                 return Result(content=Page(total=0, record=[]), message='查询成功')
+            # 教师
             elif 'teacher' in userinfo.roles:
                 if course_name:
                     uc = db.query(Teacher_Course).filter(Teacher_Course.user_id == userinfo.user_id).all()
@@ -36,6 +38,14 @@ async def get_course_me(page: int, size: int, username: str, course_name: str = 
                         record = db.query(Course).filter(Course.course_id.in_(course_ids),
                                                          Course.course_name.like('%{0}%'.format(course_name))).limit(
                             size).offset((page - 1) * size).all()
+                        # 设置VO参数
+                        for item in record:
+                            for tmp in db.query(Choice).filter(Choice.user_id == userinfo.user_id,
+                                                               Choice.course_id == item.course_id):
+                                item.status = tmp.choice_status
+                            user_id = db.query(Teacher_Course).filter(
+                                Teacher_Course.course_id == item.course_id).first().user_id
+                            item.teacher_name = db.query(User).filter(User.user_id == user_id).first().real_name
                         total = db.query(Course).filter(Course.course_id.in_(course_ids)).count()
                         return Result(content=Page(total=total, record=record), message='查询成功')
                     return Result(content=Page(total=0, record=[]), message='查询成功')
@@ -45,10 +55,19 @@ async def get_course_me(page: int, size: int, username: str, course_name: str = 
                 if course_ids:
                     record = db.query(Course).filter(Course.course_id.in_(course_ids)).limit(size).offset(
                         (page - 1) * size).all()
+                    # 设置VO参数
+                    for item in record:
+                        for tmp in db.query(Choice).filter(Choice.user_id == userinfo.user_id,
+                                                           Choice.course_id == item.course_id):
+                            item.status = tmp.choice_status
+                        user_id = db.query(Teacher_Course).filter(
+                            Teacher_Course.course_id == item.course_id).first().user_id
+                        item.teacher_name = db.query(User).filter(User.user_id == user_id).first().real_name
                     total = db.query(Course).filter(Course.course_id.in_(course_ids)).count()
                     return Result(content=Page(total=total, record=record), message='查询成功')
                 return Result(content=Page(total=0, record=[]), message='查询成功')
             else:
+                # 学生
                 if course_name:
                     choice = db.query(Choice).filter(Choice.user_id == userinfo.user_id).all()
                     course_ids: list[int] = [] if not choice else [item.course_id for item in choice]
@@ -56,6 +75,14 @@ async def get_course_me(page: int, size: int, username: str, course_name: str = 
                         record = db.query(Course).filter(Course.course_id.in_(course_ids),
                                                          Course.course_name.like('%{0}%'.format(course_name))).limit(
                             size).offset((page - 1) * size).all()
+                        # 设置VO参数
+                        for item in record:
+                            for tmp in db.query(Choice).filter(Choice.user_id == userinfo.user_id,
+                                                               Choice.course_id == item.course_id):
+                                item.status = tmp.choice_status
+                            user_id = db.query(Teacher_Course).filter(
+                                Teacher_Course.course_id == item.course_id).first().user_id
+                            item.teacher_name = db.query(User).filter(User.user_id == user_id).first().real_name
                         total = db.query(Course).filter(Course.course_id.in_(course_ids)).count()
                         return Result(content=Page(total=total, record=record), message='查询成功')
                     return Result(content=Page(total=0, record=[]), message='查询成功')
@@ -63,8 +90,16 @@ async def get_course_me(page: int, size: int, username: str, course_name: str = 
                 choice = db.query(Choice).filter(Choice.user_id == userinfo.user_id).all()
                 course_ids: list[int] = [] if not choice else [item.course_id for item in choice]
                 if course_ids:
-                    record = db.query(Course).filter(Course.course_id.in_(course_ids)).limit(size).offset(
-                        (page - 1) * size).all()
+                    record = db.query(Course).filter(Course.course_id.in_(course_ids)).limit(
+                        size).offset((page - 1) * size).all()
+                    # 设置VO参数
+                    for item in record:
+                        for tmp in db.query(Choice).filter(Choice.user_id == userinfo.user_id,
+                                                           Choice.course_id == item.course_id):
+                            item.status = tmp.choice_status
+                        user_id = db.query(Teacher_Course).filter(
+                            Teacher_Course.course_id == item.course_id).first().user_id
+                        item.teacher_name = db.query(User).filter(User.user_id == user_id).first().real_name
                     total = db.query(Course).filter(Course.course_id.in_(course_ids)).count()
                     return Result(content=Page(total=total, record=record), message='查询成功')
                 return Result(content=Page(total=0, record=[]), message='查询成功')

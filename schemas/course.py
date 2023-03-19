@@ -36,5 +36,5 @@ class BOCourse(VOCourse):
 
 class VOMyCourse(VOCourse):
     checked_in: int = None  # 已签到次数
-    not_checked_in: int = None  # 已签到次数
-    remainder: int = None  # 剩余次数
+    teacher_name: str = None  # 教师名称
+    status: int = None  # 状态
