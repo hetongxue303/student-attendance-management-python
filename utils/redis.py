@@ -13,4 +13,5 @@ async def get_userinfo() -> VOLogin:
 
 async def get_token():
     redis: Redis = await get_redis()
-    return jsonpickle.decode(await redis.get(Security.TOKEN))
+    userinfo: VOLogin = await get_userinfo()
+    return jsonpickle.decode(await redis.get(userinfo.username + ':' + Security.TOKEN))

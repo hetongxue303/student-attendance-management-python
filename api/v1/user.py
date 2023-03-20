@@ -4,9 +4,10 @@ from sqlalchemy.orm import Session
 from core.security import get_password_hash
 from database.mysql import get_db
 from exception.custom import QueryException, UpdateException, DeleteException, InsertException
-from models import User, User_Role, Student_Classes, Choice
+from models import User, User_Role, Student_Classes, Choice, Attendance, Check
+from schemas.check import VOCheck
 from schemas.result import Result, Page
-from schemas.user import BOUser, DTOUser
+from schemas.user import BOUser, DTOUser, VOChoiceStudent
 
 router = APIRouter()
 db: Session = next(get_db())
@@ -16,6 +17,43 @@ db: Session = next(get_db())
 async def get_all():
     try:
         return Result(content=db.query(User).all(), message='查询成功')
+    except:
+        raise QueryException()
+
+
+@router.get('/list/byAttendanceId', response_model=Result[Page[list[VOChoiceStudent]]], summary='获取所有签到学生')
+async def get_all_by_attendance_id(page: int, size: int, attendance_id: int = None, status: bool = None):
+    try:
+        # 查询考勤信息
+        attendance = db.query(Attendance).filter(Attendance.attendance_id == attendance_id).first()
+        # 通过考勤信息查询选课的学生有哪些
+        data = db.query(Choice).filter(Choice.course_id == attendance.course_id, Choice.choice_status == '1').all()
+        # 设置total
+        total: int = 0
+        for i in data:
+            tmp = db.query(Check).filter(Check.user_id == i.user.user_id,
+                                         Check.attendance_id == attendance_id,
+                                         Check.course_id == i.course_id).first()
+            if status and tmp:
+                total = total + 1
+            if not status and not tmp:
+                total = total + 1
+        # 设置数据
+        choices = db.query(Choice).filter(Choice.course_id == attendance.course_id, Choice.choice_status == '1').limit(
+            size).offset((page - 1) * size).all()
+        record: list[VOChoiceStudent] = []
+        if choices:
+            for item in choices:
+                user: User | BOUser = db.query(User).filter(User.user_id == item.user_id).first()
+                check: Check | VOCheck = db.query(Check).filter(Check.user_id == user.user_id,
+                                                                Check.attendance_id == attendance_id,
+                                                                Check.course_id == item.course_id).first()
+                if status and check:
+                    record.append(VOChoiceStudent(user=user, is_checked=True, check_time=check.check_time))
+                if not check and not status:
+                    record.append(VOChoiceStudent(user=user, is_checked=False))
+            return Result(content=Page(total=total, record=record), message='查询成功')
+        return Result(content=Page(total=0, record=[]), message='查询成功')
     except:
         raise QueryException()
 
@@ -45,6 +83,8 @@ async def get_by_username(username: str):
             return Result(content=db.query(User).filter(User.user_id.in_(ids)).all(), message='查询成功')
     except:
         raise QueryException()
+
+
 @router.get('/list/teacher', response_model=Result[list[BOUser]], summary='获取所有教师')
 async def get_by_username(username: str):
     try:

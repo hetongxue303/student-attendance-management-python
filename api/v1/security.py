@@ -33,7 +33,8 @@ async def login(data: OAuth2PasswordRequestForm = Depends(), code: str = Form())
                                     gender=user.gender, is_status=user.is_status, is_admin=user.is_admin,
                                     roles=await get_user_role(user_id=user.user_id), user_id=user.user_id,
                                     menus=await get_current_user_menu(user_id=user.user_id))
-        await redis.setex(name=Security.TOKEN, value=token, time=timedelta(milliseconds=settings.JWT_EXPIRE))
+        await redis.setex(name=user.username + ':' + Security.TOKEN, value=token,
+                          time=timedelta(milliseconds=settings.JWT_EXPIRE))
         await redis.set(name='userinfo', value=jsonpickle.encode(userinfo))
         return Token(code=200, message='登陆成功', access_token=token, expired_time=settings.JWT_EXPIRE, user=userinfo)
 

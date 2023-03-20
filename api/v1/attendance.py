@@ -41,7 +41,7 @@ async def get_page(page: int, size: int, status: int = None):
 @router.post('/add', response_model=Result, summary='添加签到记录')
 async def insert(data: VOAttendance):
     try:
-        db.add(Attendance(user_id=data.user_id, course_id=data.course_id, time=data.time, status='1'))
+        db.add(Attendance(user_id=data.user_id, course_id=data.course_id, time=data.time))
         db.commit()
         return Result(message='添加成功')
     except:

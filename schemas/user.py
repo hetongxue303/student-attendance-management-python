@@ -41,3 +41,13 @@ class VOStudent(BOUser):
 
 class DTOStudent(BOUser):
     password: str = None
+
+
+class VOChoiceStudent(BaseModel):
+    user: BOUser = None
+    is_checked: bool = None  # 是否签到
+    check_time: datetime = None  # 签到时间
+
+    class Config:
+        orm_mode = True
+        arbitrary_types_allowed = True
