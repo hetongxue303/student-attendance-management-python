@@ -26,8 +26,10 @@ async def get_all_by_attendance_id(page: int, size: int, attendance_id: int = No
     try:
         # 查询考勤信息
         attendance = db.query(Attendance).filter(Attendance.attendance_id == attendance_id).first()
+
         # 通过考勤信息查询选课的学生有哪些
         data = db.query(Choice).filter(Choice.course_id == attendance.course_id, Choice.choice_status == '1').all()
+
         # 设置total
         total: int = 0
         for i in data:
@@ -38,6 +40,7 @@ async def get_all_by_attendance_id(page: int, size: int, attendance_id: int = No
                 total = total + 1
             if not status and not tmp:
                 total = total + 1
+                
         # 设置数据
         choices = db.query(Choice).filter(Choice.course_id == attendance.course_id, Choice.choice_status == '1').limit(
             size).offset((page - 1) * size).all()
